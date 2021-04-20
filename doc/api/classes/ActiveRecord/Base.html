@@ -1,0 +1,1647 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Class: ActiveRecord::Base</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+	<script type="text/javascript">
+	// <![CDATA[
+
+	function popupCode( url ) {
+		window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+	}
+
+	function toggleCode( id ) {
+		if ( document.getElementById )
+			elem = document.getElementById( id );
+		else if ( document.all )
+			elem = eval( "document.all." + id );
+		else
+			return false;
+
+		elemStyle = elem.style;
+		
+		if ( elemStyle.display != "block" ) {
+			elemStyle.display = "block"
+		} else {
+			elemStyle.display = "none"
+		}
+
+		return true;
+	}
+	
+	// Make codeblocks hidden by default
+	document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+	
+	// ]]>
+	</script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <h1>ActiveRecord::Base <sup class="type-note">(Class)</sup></h1>
+        <table class="header-table">
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/vendor/activerecord/lib/active_record/base_rb.html">
+                vendor/activerecord/lib/active_record/base.rb
+                </a>
+				<br />
+                <a href="../../files/vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter_rb.html">
+                vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb
+                </a>
+				<br />
+                <a href="../../files/vendor/activerecord/lib/active_record/connection_adapters/mysql_adapter_rb.html">
+                vendor/activerecord/lib/active_record/connection_adapters/mysql_adapter.rb
+                </a>
+				<br />
+                <a href="../../files/vendor/activerecord/lib/active_record/connection_adapters/postgresql_adapter_rb.html">
+                vendor/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb
+                </a>
+				<br />
+                <a href="../../files/vendor/activerecord/lib/active_record/connection_adapters/sqlite_adapter_rb.html">
+                vendor/activerecord/lib/active_record/connection_adapters/sqlite_adapter.rb
+                </a>
+				<br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+	<div id="bodyContent">
+
+
+	<div id="contextContent">
+
+		<div id="description">
+			<p>
+Active Record objects doesn&#8217;t specify their attributes directly, but
+rather infer them from the table definition with which they&#8217;re
+linked. Adding, removing, and changing attributes and their type is done
+directly in the database. Any change is instantly reflected in the Active
+Record objects. The mapping that binds a given Active Record class to a
+certain database table will happen automatically in most common cases, but
+can be overwritten for the uncommon ones.
+</p>
+<p>
+See the mapping rules in <a href="Base.html#M000139">table_name</a> and the
+full example in <a
+href="../../files/README.html">../../files/README.html</a> for more
+insight.
+</p>
+<h2>Creation</h2>
+<p>
+Active Records accepts constructor parameters either in a hash or as a
+block. The hash method is especially useful when you&#8217;re receiving the
+data from somewhere else, like a HTTP request. It works like this:
+</p>
+<pre>
+  user = User.new(&quot;name&quot; =&gt; &quot;David&quot;, &quot;occupation&quot; =&gt; &quot;Code Artist&quot;)
+  user.name # =&gt; &quot;David&quot;
+</pre>
+<p>
+You can also use block initialization:
+</p>
+<pre>
+  user = User.new do |u|
+    u.name = &quot;David&quot;
+    u.occupation = &quot;Code Artist&quot;
+  end
+</pre>
+<p>
+And of course you can just create a bare object and specify the attributes
+after the fact:
+</p>
+<pre>
+  user = User.new
+  user.name = &quot;David&quot;
+  user.occupation = &quot;Code Artist&quot;
+</pre>
+<h2>Conditions</h2>
+<p>
+Conditions can either be specified as a string or an array representing the
+WHERE-part of an SQL statement. The array form is to be used when the
+condition input is tainted and requires sanitization. The string form can
+be used for statements that doesn&#8217;t involve tainted data. Examples:
+</p>
+<pre>
+  User &lt; ActiveRecord::Base
+    def authenticate_unsafely(user_name, password)
+      find_first(&quot;user_name = '#{user_name}' AND password = '#{password}'&quot;)
+    end
+
+    def authenticate_safely(user_name, password)
+      find_first([ &quot;user_name = '%s' AND password = '%s'&quot;, user_name, password ])
+    end
+  end
+</pre>
+<p>
+The <tt>authenticate_unsafely</tt> method inserts the parameters directly
+into the query and is thus susceptible to SQL-injection attacks if the
+<tt>user_name</tt> and <tt>password</tt> parameters come directly from a
+HTTP request. The <tt>authenticate_safely</tt> method, on the other hand,
+will sanitize the <tt>user_name</tt> and <tt>password</tt> before inserting
+them in the query, which will ensure that an attacker can&#8217;t escape
+the query and fake the login (or worse).
+</p>
+<h2>Overwriting default accessors</h2>
+<p>
+All column values are automatically available through basic accessors on
+the Active Record object, but some times you want to specialize this
+behavior. This can be done by either by overwriting the default accessors
+(using the same name as the attribute) calling <a
+href="Base.html#M000157">read_attribute</a>(attr_name) and <a
+href="Base.html#M000158">write_attribute</a>(attr_name, value) to actually
+change things. Example:
+</p>
+<pre>
+  class Song &lt; ActiveRecord::Base
+    # Uses an integer of seconds to hold the length of the song
+
+    def length=(minutes)
+      write_attribute(&quot;length&quot;, minutes * 60)
+    end
+
+    def length
+      read_attribute(&quot;length&quot;) / 60
+    end
+  end
+</pre>
+<h2>Saving arrays, hashes, and other non-mappeable objects in text columns</h2>
+<p>
+Active Record will automatically attempt to serialize (using YAML) any
+object in text columns that isn&#8217;t either a String, NilClass,
+TrueClass, FalseClass, Fixnum, Date, or Time. This makes it possible to
+store arrays, hashes, and other non-mappeable objects without doing any
+additional work. Example:
+</p>
+<pre>
+   user = User.find(1)
+   user.preferences = { &quot;background&quot; =&gt; &quot;black&quot;, &quot;display&quot; =&gt; large }
+   user.save
+
+   User.find(1).preferences # =&gt; { &quot;background&quot; =&gt; &quot;black&quot;, &quot;display&quot; =&gt; large }
+</pre>
+<h2>Exceptions</h2>
+<ul>
+<li><tt>ActiveRecordError</tt> &#8212; generic error class and superclass of
+all other errors raised by Active Record
+
+</li>
+<li><tt>AdapterNotSpecified</tt> &#8212; the configuration hash used in <tt><a
+href="Base.html#M000159">establish_connection</a></tt> didn&#8217;t include
+a <tt>:adapter</tt> key.
+
+</li>
+<li><tt>AdapterNotSpecified</tt> &#8212; the <tt>:adapter</tt> key used in
+<tt><a href="Base.html#M000159">establish_connection</a></tt> specified an
+unexisting adapter (or a bad spelling of an existing one).
+<tt>:adapter</tt> key.
+
+</li>
+<li><tt>ConnectionNotEstablished</tt> &#8212; no connection has been
+established. Use <tt><a
+href="Base.html#M000159">establish_connection</a></tt> before querying.
+
+</li>
+<li><tt>RecordNotFound</tt> &#8212; no record responded to the find* method.
+Either the row with the given ID doesn&#8217;t exist or the row
+didn&#8217;t meet the additional restrictions.
+
+</li>
+<li><tt>StatementInvalid</tt> &#8212; the database server rejected the SQL
+statement. The precise error is added in the message. Either the record
+with the given ID doesn&#8217;t exist or the record didn&#8217;t meet the
+additional restrictions.
+
+</li>
+</ul>
+<p>
+<b>Note</b>: The attributes listed are class-level attributes (accessible
+from both the class and instance level). So it&#8217;s possible to assign a
+logger to the class through Base.logger= which will then be used by all
+instances in the current object space.
+</p>
+
+		</div>
+
+
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000156">==</a>&nbsp;&nbsp;
+			<a href="#M000138">attr_accessible</a>&nbsp;&nbsp;
+			<a href="#M000137">attr_protected</a>&nbsp;&nbsp;
+			<a href="#M000154">attribute_names</a>&nbsp;&nbsp;
+			<a href="#M000153">attribute_present?</a>&nbsp;&nbsp;
+			<a href="#M000152">attributes=</a>&nbsp;&nbsp;
+			<a href="#M000155">column_for_attribute</a>&nbsp;&nbsp;
+			<a href="#M000141">columns</a>&nbsp;&nbsp;
+			<a href="#M000142">columns_hash</a>&nbsp;&nbsp;
+			<a href="#M000123">connected?</a>&nbsp;&nbsp;
+			<a href="#M000143">content_columns</a>&nbsp;&nbsp;
+			<a href="#M000133">count</a>&nbsp;&nbsp;
+			<a href="#M000134">count_by_sql</a>&nbsp;&nbsp;
+			<a href="#M000129">create</a>&nbsp;&nbsp;
+			<a href="#M000136">decrement_counter</a>&nbsp;&nbsp;
+			<a href="#M000132">delete_all</a>&nbsp;&nbsp;
+			<a href="#M000150">destroy</a>&nbsp;&nbsp;
+			<a href="#M000131">destroy_all</a>&nbsp;&nbsp;
+			<a href="#M000159">establish_connection</a>&nbsp;&nbsp;
+			<a href="#M000124">find</a>&nbsp;&nbsp;
+			<a href="#M000126">find_all</a>&nbsp;&nbsp;
+			<a href="#M000127">find_by_sql</a>&nbsp;&nbsp;
+			<a href="#M000128">find_first</a>&nbsp;&nbsp;
+			<a href="#M000125">find_on_conditions</a>&nbsp;&nbsp;
+			<a href="#M000144">human_attribute_name</a>&nbsp;&nbsp;
+			<a href="#M000146">id</a>&nbsp;&nbsp;
+			<a href="#M000147">id=</a>&nbsp;&nbsp;
+			<a href="#M000135">increment_counter</a>&nbsp;&nbsp;
+			<a href="#M000145">new</a>&nbsp;&nbsp;
+			<a href="#M000148">new_record?</a>&nbsp;&nbsp;
+			<a href="#M000140">primary_key</a>&nbsp;&nbsp;
+			<a href="#M000157">read_attribute</a>&nbsp;&nbsp;
+			<a href="#M000149">save</a>&nbsp;&nbsp;
+			<a href="#M000160">symbolize_strings_in_hash</a>&nbsp;&nbsp;
+			<a href="#M000139">table_name</a>&nbsp;&nbsp;
+			<a href="#M000130">update_all</a>&nbsp;&nbsp;
+			<a href="#M000151">update_attribute</a>&nbsp;&nbsp;
+			<a href="#M000158">write_attribute</a>&nbsp;&nbsp;
+			</div>
+		</div>
+
+
+
+
+			
+
+	</div>
+
+
+
+		<!-- if includes -->
+		<div id="includes">
+			<h2 class="section-bar">Included Modules</h2>
+
+			<div id="includes-list">
+		    <span class="include-name">ClassInheritableAttributes</span>
+			</div>
+		</div>
+
+
+		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Class methods</h2>
+
+			<!-- connected?() -->
+			<div id="method-M000123" class="method-detail">
+				<a name="M000123"></a>
+
+				<div class="method-heading">
+					<a href="#M000123" class="method-signature">
+					<span class="method-name">connected?</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000123-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000123-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 134</span>
+134:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">connected?</span>
+135:       <span class="ruby-operator">!</span><span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>[<span class="ruby-value str">'connection'</span>].<span class="ruby-identifier">nil?</span>
+136:     <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- find(*ids) -->
+			<div id="method-M000124" class="method-detail">
+				<a name="M000124"></a>
+
+				<div class="method-heading">
+					<a href="#M000124" class="method-signature">
+					<span class="method-name">find</span><span class="method-args">(*ids)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns objects for the records responding to either a specific id (1), a
+list of ids (1, 5, 6) or an array of ids. If only one ID is specified, that
+object is returned directly. If more than one ID is specified, an array is
+returned. Examples:
+</p>
+<pre>
+  Person.find(1)       # returns the object for ID = 1
+  Person.find(1, 2, 6) # returns an array for objects with IDs in (1, 2, 6)
+  Person.find([7, 17]) # returns an array for objects with IDs in (7, 17)
+</pre>
+<p>
+<tt>RecordNotFound</tt> is raised if no record can be found.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000124-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000124-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 170</span>
+170:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ids</span>)
+171:         <span class="ruby-identifier">ids</span> = [ <span class="ruby-identifier">ids</span> ].<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">compact</span>
+172: 
+173:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+174:           <span class="ruby-identifier">ids_list</span> = <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">map</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">id</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;'#{id}'&quot;</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;, &quot;</span>)
+175:           <span class="ruby-identifier">objects</span>  = <span class="ruby-identifier">find_all</span>(<span class="ruby-node">&quot;#{primary_key} IN (#{ids_list})&quot;</span>, <span class="ruby-identifier">primary_key</span>)
+176: 
+177:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">objects</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">length</span>
+178:             <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">objects</span>
+179:           <span class="ruby-keyword kw">else</span>
+180:             <span class="ruby-identifier">raise</span> <span class="ruby-constant">RecordNotFound</span>, <span class="ruby-node">&quot;Couldn't find #{name} with ID in (#{ids_list})&quot;</span>
+181:           <span class="ruby-keyword kw">end</span>
+182:         <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+183:           <span class="ruby-identifier">id</span> = <span class="ruby-identifier">ids</span>.<span class="ruby-identifier">first</span>
+184:           <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;SELECT * FROM #{table_name} WHERE #{primary_key} = '#{id}'&quot;</span>
+185:           <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;AND type = '#{name.gsub(/.*::/, '')}'&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">descents_from_active_record?</span>
+186: 
+187:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">record</span> = <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">select_one</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Find&quot;</span>)
+188:             <span class="ruby-identifier">instantiate</span>(<span class="ruby-identifier">record</span>)
+189:           <span class="ruby-keyword kw">else</span> 
+190:             <span class="ruby-identifier">raise</span> <span class="ruby-constant">RecordNotFound</span>, <span class="ruby-node">&quot;Couldn't find #{name} with ID = #{id}&quot;</span>
+191:           <span class="ruby-keyword kw">end</span>
+192:         <span class="ruby-keyword kw">else</span>
+193:           <span class="ruby-identifier">raise</span> <span class="ruby-constant">RecordNotFound</span>, <span class="ruby-node">&quot;Couldn't find #{name} without an ID&quot;</span>
+194:         <span class="ruby-keyword kw">end</span>
+195:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- find_on_conditions(id, conditions) -->
+			<div id="method-M000125" class="method-detail">
+				<a name="M000125"></a>
+
+				<div class="method-heading">
+					<a href="#M000125" class="method-signature">
+					<span class="method-name">find_on_conditions</span><span class="method-args">(id, conditions)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Works like find, but the record matching <tt>id</tt> must also meet the
+<tt>conditions</tt>. <tt>RecordNotFound</tt> is raised if no record can be
+found matching the <tt>id</tt> or meeting the condition. Example:
+</p>
+<pre>
+  Person.find_on_conditions 5, &quot;first_name LIKE '%dav%' AND last_name = 'heinemeier'&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000125-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000125-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 201</span>
+201:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_on_conditions</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">conditions</span>)
+202:         <span class="ruby-identifier">find_first</span>(<span class="ruby-node">&quot;#{primary_key} = '#{id}' AND #{sanitize_conditions(conditions)}&quot;</span>) <span class="ruby-operator">||</span> 
+203:             <span class="ruby-identifier">raise</span>(<span class="ruby-constant">RecordNotFound</span>, <span class="ruby-node">&quot;Couldn't find #{name} with #{primary_key} = #{id} on the condition of #{conditions}&quot;</span>)
+204:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- find_all(conditions = nil, orderings = nil, limit = nil, joins = nil) -->
+			<div id="method-M000126" class="method-detail">
+				<a name="M000126"></a>
+
+				<div class="method-heading">
+					<a href="#M000126" class="method-signature">
+					<span class="method-name">find_all</span><span class="method-args">(conditions = nil, orderings = nil, limit = nil, joins = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of all the objects that could be instantiated from the
+associated table in the database. The <tt>conditions</tt> can be used to
+narrow the selection of objects (WHERE-part), such as by &quot;color =
+&#8216;red&#8217;&quot;, and arrangement of the selection can be done
+through <tt>orderings</tt> (ORDER BY-part), such as by &quot;last_name,
+first_name DESC&quot;. A maximum of returned objects can be specified in
+<tt>limit</tt>. Example:
+</p>
+<pre>
+  Project.find_all &quot;category = 'accounts'&quot;, &quot;last_accessed DESC&quot;, 15
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000126-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000126-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 211</span>
+211:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_all</span>(<span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">orderings</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">limit</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">joins</span> = <span class="ruby-keyword kw">nil</span>)
+212:         <span class="ruby-identifier">sql</span>  = <span class="ruby-node">&quot;SELECT * FROM #{table_name} &quot;</span> 
+213:         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{joins} &quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">joins</span>
+214:         <span class="ruby-identifier">add_conditions!</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conditions</span>)
+215:         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;ORDER BY #{orderings} &quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">orderings</span>.<span class="ruby-identifier">nil?</span>
+216:         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;LIMIT #{limit} &quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">limit</span>.<span class="ruby-identifier">nil?</span>
+217:     
+218:         <span class="ruby-identifier">find_by_sql</span>(<span class="ruby-identifier">sql</span>)
+219:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- find_by_sql(sql) -->
+			<div id="method-M000127" class="method-detail">
+				<a name="M000127"></a>
+
+				<div class="method-heading">
+					<a href="#M000127" class="method-signature">
+					<span class="method-name">find_by_sql</span><span class="method-args">(sql)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Works like <a href="Base.html#M000126">find_all</a>, but requires a
+complete SQL string. Example:
+</p>
+<pre>
+  Post.find_by_sql &quot;SELECT p.*, c.author FROM posts p, comments c WHERE p.id = c.post_id&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000127-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000127-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 223</span>
+223:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_by_sql</span>(<span class="ruby-identifier">sql</span>)
+224:         <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">select_all</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Load&quot;</span>).<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">objects</span>, <span class="ruby-identifier">record</span><span class="ruby-operator">|</span> <span class="ruby-identifier">objects</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">instantiate</span>(<span class="ruby-identifier">record</span>) }
+225:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- find_first(conditions = nil, orderings = nil) -->
+			<div id="method-M000128" class="method-detail">
+				<a name="M000128"></a>
+
+				<div class="method-heading">
+					<a href="#M000128" class="method-signature">
+					<span class="method-name">find_first</span><span class="method-args">(conditions = nil, orderings = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the object for the first record responding to the conditions in
+<tt>conditions</tt>, such as &quot;group = &#8216;master&#8217;&quot;. If
+more than one record is returned from the query, it&#8217;s the first
+that&#8217;ll be used to create the object. In such cases, it might be
+beneficial to also specify <tt>orderings</tt>, like &quot;income DESC,
+name&quot;, to control exactly which record is to be used. Example:
+</p>
+<pre>
+  Employee.find_first &quot;income &gt; 50000&quot;, &quot;income DESC, name&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000128-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000128-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 232</span>
+232:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_first</span>(<span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">orderings</span> = <span class="ruby-keyword kw">nil</span>)
+233:         <span class="ruby-identifier">sql</span>  = <span class="ruby-node">&quot;SELECT * FROM #{table_name} &quot;</span>
+234:         <span class="ruby-identifier">add_conditions!</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conditions</span>)
+235:         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;ORDER BY #{orderings} &quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">orderings</span>.<span class="ruby-identifier">nil?</span>
+236:         <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;LIMIT 1&quot;</span>
+237:     
+238:         <span class="ruby-identifier">record</span> = <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">select_one</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Load First&quot;</span>)
+239:         <span class="ruby-identifier">instantiate</span>(<span class="ruby-identifier">record</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">record</span>.<span class="ruby-identifier">nil?</span>
+240:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- create(attributes = nil) -->
+			<div id="method-M000129" class="method-detail">
+				<a name="M000129"></a>
+
+				<div class="method-heading">
+					<a href="#M000129" class="method-signature">
+					<span class="method-name">create</span><span class="method-args">(attributes = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Creates an object, instantly saves it as a record (if the validation
+permits it), and returns it. If the save fail under validations, the
+unsaved object is still returned.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000129-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000129-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 244</span>
+244:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">attributes</span> = <span class="ruby-keyword kw">nil</span>)
+245:         <span class="ruby-identifier">object</span> = <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attributes</span>)
+246:         <span class="ruby-identifier">object</span>.<span class="ruby-identifier">save</span>
+247:         <span class="ruby-identifier">object</span>
+248:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- update_all(updates, conditions = nil) -->
+			<div id="method-M000130" class="method-detail">
+				<a name="M000130"></a>
+
+				<div class="method-heading">
+					<a href="#M000130" class="method-signature">
+					<span class="method-name">update_all</span><span class="method-args">(updates, conditions = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Updates all records with the SET-part of an SQL update statement in
+<tt>updates</tt>. A subset of the records can be selected by specifying
+<tt>conditions</tt>. Example:
+</p>
+<pre>
+  Billing.update_all &quot;category = 'authorized', approved = 1&quot;, &quot;author = 'David'&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000130-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000130-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 253</span>
+253:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update_all</span>(<span class="ruby-identifier">updates</span>, <span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>)
+254:         <span class="ruby-identifier">sql</span>  = <span class="ruby-node">&quot;UPDATE #{table_name} SET #{updates} &quot;</span>
+255:         <span class="ruby-identifier">add_conditions!</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conditions</span>)
+256:         <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Update&quot;</span>)
+257:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- destroy_all(conditions = nil) -->
+			<div id="method-M000131" class="method-detail">
+				<a name="M000131"></a>
+
+				<div class="method-heading">
+					<a href="#M000131" class="method-signature">
+					<span class="method-name">destroy_all</span><span class="method-args">(conditions = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Destroys the objects for all the records that matches the
+<tt>condition</tt> by instantiating each object and calling the destroy
+method. Example:
+</p>
+<pre>
+  Person.destroy_all &quot;last_login &lt; '2004-04-04'&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000131-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000131-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 262</span>
+262:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">destroy_all</span>(<span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>)
+263:         <span class="ruby-identifier">find_all</span>(<span class="ruby-identifier">conditions</span>).<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">destroy</span> }
+264:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- delete_all(conditions = nil) -->
+			<div id="method-M000132" class="method-detail">
+				<a name="M000132"></a>
+
+				<div class="method-heading">
+					<a href="#M000132" class="method-signature">
+					<span class="method-name">delete_all</span><span class="method-args">(conditions = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Deletes all the records that matches the <tt>condition</tt> without
+instantiating the objects first (and hence not calling the destroy method).
+Example:
+</p>
+<pre>
+  Post.destroy_all &quot;person_id = 5 AND (category = 'Something' OR category = 'Else')&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000132-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000132-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 269</span>
+269:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">delete_all</span>(<span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>)
+270:         <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;DELETE FROM #{table_name} &quot;</span>
+271:         <span class="ruby-identifier">add_conditions!</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conditions</span>)
+272:         <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Delete all&quot;</span>)
+273:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- count(conditions = nil) -->
+			<div id="method-M000133" class="method-detail">
+				<a name="M000133"></a>
+
+				<div class="method-heading">
+					<a href="#M000133" class="method-signature">
+					<span class="method-name">count</span><span class="method-args">(conditions = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the number of records that meets the <tt>conditions</tt>. Zero is
+returned if no records match. Example:
+</p>
+<pre>
+  Product.count &quot;sales &gt; 1&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000133-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000133-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 277</span>
+277:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">count</span>(<span class="ruby-identifier">conditions</span> = <span class="ruby-keyword kw">nil</span>)
+278:         <span class="ruby-identifier">sql</span>  = <span class="ruby-node">&quot;SELECT COUNT(*) FROM #{table_name} &quot;</span>
+279:         <span class="ruby-identifier">add_conditions!</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conditions</span>)
+280:         <span class="ruby-identifier">count_by_sql</span>(<span class="ruby-identifier">sql</span>)
+281:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- count_by_sql(sql) -->
+			<div id="method-M000134" class="method-detail">
+				<a name="M000134"></a>
+
+				<div class="method-heading">
+					<a href="#M000134" class="method-signature">
+					<span class="method-name">count_by_sql</span><span class="method-args">(sql)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the result of an SQL statement that should only include a COUNT(*)
+in the SELECT part.
+</p>
+<pre>
+  Product.count &quot;SELECT COUNT(*) FROM sales s, customers c WHERE s.customer_id = c.id&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000134-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000134-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 285</span>
+285:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">count_by_sql</span>(<span class="ruby-identifier">sql</span>)
+286:         <span class="ruby-identifier">count</span> = <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">select_one</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-node">&quot;#{name} Count&quot;</span>).<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>
+287:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">count</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">count</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">:</span> <span class="ruby-value">0</span>
+288:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- increment_counter(counter_name, id) -->
+			<div id="method-M000135" class="method-detail">
+				<a name="M000135"></a>
+
+				<div class="method-heading">
+					<a href="#M000135" class="method-signature">
+					<span class="method-name">increment_counter</span><span class="method-args">(counter_name, id)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Increments the specified counter by one. So
+<tt>DiscussionBoard.increment_counter(&quot;post_count&quot;,
+discussion_board_id)</tt> would increment the &quot;post_count&quot;
+counter on the board responding to discussion_board_id. This is used for
+caching aggregate values, so that they doesn&#8217;t need to be computed
+every time. Especially important for looping over a collection where each
+element require a number of aggregate values. Like the DiscussionBoard that
+needs to list both the number of posts and comments.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000135-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000135-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 295</span>
+295:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">increment_counter</span>(<span class="ruby-identifier">counter_name</span>, <span class="ruby-identifier">id</span>)
+296:         <span class="ruby-identifier">object</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">id</span>)
+297:         <span class="ruby-identifier">object</span>.<span class="ruby-identifier">update_attribute</span>(<span class="ruby-identifier">counter_name</span>, <span class="ruby-identifier">object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">counter_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+298:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- decrement_counter(counter_name, id) -->
+			<div id="method-M000136" class="method-detail">
+				<a name="M000136"></a>
+
+				<div class="method-heading">
+					<a href="#M000136" class="method-signature">
+					<span class="method-name">decrement_counter</span><span class="method-args">(counter_name, id)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Works like <a href="Base.html#M000135">increment_counter</a>, but
+decrements instead.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000136-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000136-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 301</span>
+301:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">decrement_counter</span>(<span class="ruby-identifier">counter_name</span>, <span class="ruby-identifier">id</span>)
+302:         <span class="ruby-identifier">object</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">id</span>)
+303:         <span class="ruby-identifier">object</span>.<span class="ruby-identifier">update_attribute</span>(<span class="ruby-identifier">counter_name</span>, <span class="ruby-identifier">object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">counter_name</span>) <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)
+304:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- attr_protected(*attributes) -->
+			<div id="method-M000137" class="method-detail">
+				<a name="M000137"></a>
+
+				<div class="method-heading">
+					<a href="#M000137" class="method-signature">
+					<span class="method-name">attr_protected</span><span class="method-args">(*attributes)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Attributes named in this macro are protected from mass-assignment, such as
+<tt>new(attributes)</tt> and <tt>attributes=(attributes)</tt>. Their
+assignment will simply be ignored. Instead, you can use the direct writer
+methods to do assignment. This is meant to protect sensitive attributes to
+be overwritten by URL/form hackers. Example:
+</p>
+<pre>
+  class Customer &lt; ActiveRecord::Base
+    attr_protected :credit_rating
+  end
+
+  customer = Customer.new(&quot;name&quot; =&gt; David, &quot;credit_rating&quot; =&gt; &quot;Excellent&quot;)
+  customer.credit_rating # =&gt; nil
+  customer.attributes = { &quot;description&quot; =&gt; &quot;Jolly fellow&quot;, &quot;credit_rating&quot; =&gt; &quot;Superb&quot; }
+  customer.credit_rating # =&gt; nil
+
+  customer.credit_rating = &quot;Average&quot;
+  customer.credit_rating # =&gt; &quot;Average&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000137-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000137-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 321</span>
+321:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">attr_protected</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attributes</span>)
+322:         <span class="ruby-identifier">write_inheritable_array</span>(<span class="ruby-value str">&quot;attr_protected&quot;</span>, <span class="ruby-identifier">attributes</span>)
+323:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- attr_accessible(*attributes) -->
+			<div id="method-M000138" class="method-detail">
+				<a name="M000138"></a>
+
+				<div class="method-heading">
+					<a href="#M000138" class="method-signature">
+					<span class="method-name">attr_accessible</span><span class="method-args">(*attributes)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+If this macro is used, only those attributed named in it will be accessible
+for mass-assignment, such as <tt>new(attributes)</tt> and
+<tt>attributes=(attributes)</tt>. This is the more conservative choice for
+mass-assignment protection. If you&#8217;d rather start from an all-open
+default and restrict attributes as needed, have a look at <a
+href="Base.html#M000137">attr_protected</a>.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000138-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000138-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 334</span>
+334:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">attr_accessible</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attributes</span>)
+335:         <span class="ruby-identifier">write_inheritable_array</span>(<span class="ruby-value str">&quot;attr_accessible&quot;</span>, <span class="ruby-identifier">attributes</span>)
+336:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- table_name(class_name = class_name_of_active_record_descendant(self)) -->
+			<div id="method-M000139" class="method-detail">
+				<a name="M000139"></a>
+
+				<div class="method-heading">
+					<a href="#M000139" class="method-signature">
+					<span class="method-name">table_name</span><span class="method-args">(class_name = class_name_of_active_record_descendant(self))</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Guesses the table name (in forced lower-case) based on the name of the
+class in the inheritance hierarchy descending directly from ActiveRecord.
+So if the hierarchy looks like: Reply &lt; Message &lt; ActiveRecord, then
+Message is used to guess the table name from even when called on Reply. The
+guessing rules are as follows:
+</p>
+<ul>
+<li>Class name doesn&#8217;t end in &quot;s&quot; or &quot;y&quot;: An
+&quot;s&quot; is appended, so a Comment class becomes a comments table.
+
+</li>
+<li>Class name ends in a &quot;y&quot;: The &quot;y&quot; is replaced with
+&quot;ies&quot;, so a Category class becomes a categories table.
+
+</li>
+<li>Class name ends in an &quot;s&quot;: No additional characters are added or
+removed.
+
+</li>
+<li>Class name with word compositions: Compositions are underscored, so
+CreditCard class becomes a credit_cards table.
+
+</li>
+</ul>
+<p>
+Additionally, the class-level table_name_prefix is prepended to the <a
+href="Base.html#M000139">table_name</a> and the table_name_suffix is
+appended. So if you have &quot;myapp_&quot; as a prefix, the table name
+guess for an Account class becomes &quot;myapp_accounts&quot;.
+</p>
+<p>
+You can also overwrite this class method to allow for unguessable links,
+such as a Person class with a link to a People table. Example:
+</p>
+<pre>
+  class Person &lt; ActiveRecord::Base
+     def self.table_name() &quot;people&quot; end
+  end
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000139-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000139-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 359</span>
+359:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">table_name</span>(<span class="ruby-identifier">class_name</span> = <span class="ruby-identifier">class_name_of_active_record_descendant</span>(<span class="ruby-keyword kw">self</span>))
+360:         <span class="ruby-identifier">table_name_prefix</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">undecorated_table_name</span>(<span class="ruby-identifier">class_name</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">table_name_suffix</span>
+361:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- primary_key() -->
+			<div id="method-M000140" class="method-detail">
+				<a name="M000140"></a>
+
+				<div class="method-heading">
+					<a href="#M000140" class="method-signature">
+					<span class="method-name">primary_key</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Defines the primary key field &#8212; can be overridden in subclasses.
+Overwritting will negate any effect of the primary_key_prefix_type setting,
+though.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000140-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000140-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 365</span>
+365:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">primary_key</span>
+366:         <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">primary_key_prefix_type</span>
+367:           <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:table_name</span>                 
+368:             <span class="ruby-node">&quot;#{class_name_of_active_record_descendant(self).downcase}id&quot;</span>
+369:           <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:table_name_with_underscore</span>
+370:             <span class="ruby-node">&quot;#{class_name_of_active_record_descendant(self).downcase}_id&quot;</span>
+371:           <span class="ruby-keyword kw">else</span>
+372:             <span class="ruby-value str">&quot;id&quot;</span>
+373:         <span class="ruby-keyword kw">end</span>
+374:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- columns() -->
+			<div id="method-M000141" class="method-detail">
+				<a name="M000141"></a>
+
+				<div class="method-heading">
+					<a href="#M000141" class="method-signature">
+					<span class="method-name">columns</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of column objects for the table associated with this
+class.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000141-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000141-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 395</span>
+395:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">columns</span>
+396:         <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">columns</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-node">&quot;#{name} Columns&quot;</span>)
+397:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- columns_hash() -->
+			<div id="method-M000142" class="method-detail">
+				<a name="M000142"></a>
+
+				<div class="method-heading">
+					<a href="#M000142" class="method-signature">
+					<span class="method-name">columns_hash</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of column objects for the table associated with this
+class.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000142-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000142-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 400</span>
+400:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">columns_hash</span>
+401:         <span class="ruby-ivar">@columns_hash</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">inject</span>({}) { <span class="ruby-operator">|</span><span class="ruby-identifier">hash</span>, <span class="ruby-identifier">column</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">column</span>; <span class="ruby-identifier">hash</span> }
+402:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- content_columns() -->
+			<div id="method-M000143" class="method-detail">
+				<a name="M000143"></a>
+
+				<div class="method-heading">
+					<a href="#M000143" class="method-signature">
+					<span class="method-name">content_columns</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of columns objects where the primary id, all columns
+ending in &quot;_id&quot; or &quot;_count&quot;, and columns named
+&quot;type&quot; has been removed.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000143-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000143-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 406</span>
+406:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">content_columns</span>
+407:         <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">reject</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">primary_key</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/(_id|_count)$/</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;type&quot;</span> }
+408:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- human_attribute_name(attribute_key_name) -->
+			<div id="method-M000144" class="method-detail">
+				<a name="M000144"></a>
+
+				<div class="method-heading">
+					<a href="#M000144" class="method-signature">
+					<span class="method-name">human_attribute_name</span><span class="method-args">(attribute_key_name)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Transforms attribute key names into a more humane format, such as
+&quot;First name&quot; instead of &quot;first_name&quot;. Example:
+</p>
+<pre>
+  Person.human_attribute_name(&quot;first_name&quot;) # =&gt; &quot;First name&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000144-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000144-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 412</span>
+412:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">human_attribute_name</span>(<span class="ruby-identifier">attribute_key_name</span>)
+413:         <span class="ruby-identifier">attribute_key_name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/_/</span>, <span class="ruby-value str">&quot; &quot;</span>).<span class="ruby-identifier">capitalize</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">attribute_key_name</span>.<span class="ruby-identifier">nil?</span>
+414:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- new(attributes = nil) {|self if block_given?| ...} -->
+			<div id="method-M000145" class="method-detail">
+				<a name="M000145"></a>
+
+				<div class="method-heading">
+					<a href="#M000145" class="method-signature">
+					<span class="method-name">new</span><span class="method-args">(attributes = nil) {|self if block_given?| ...}</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+New objects can be instantiated as either empty (pass no construction
+parameter) or pre-set with attributes but not yet saved (pass a hash with
+key names matching the associated table column names). In both instances,
+valid attribute keys are determined by the column names of the associated
+table &#8212; hence you can&#8217;t have attributes that aren&#8217;t part
+of the table columns.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000145-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000145-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 505</span>
+505:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">attributes</span> = <span class="ruby-keyword kw">nil</span>)
+506:         <span class="ruby-ivar">@attributes</span> = <span class="ruby-identifier">attributes_from_column_definition</span>
+507:         <span class="ruby-ivar">@new_record</span> = <span class="ruby-keyword kw">true</span>
+508:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">attributes</span> = <span class="ruby-identifier">attributes</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">attributes</span>.<span class="ruby-identifier">nil?</span>
+509:         <span class="ruby-keyword kw">yield</span> <span class="ruby-keyword kw">self</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+510:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- establish_connection(config) -->
+			<div id="method-M000159" class="method-detail">
+				<a name="M000159"></a>
+
+				<div class="method-heading">
+					<a href="#M000159" class="method-signature">
+					<span class="method-name">establish_connection</span><span class="method-args">(config)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Establishes the connection to the database. Accepts a hash as input where
+the :adapter key must be specified with the name of a database adapter (in
+lower-case) example for regular databases (MySQL, Postgresql, etc):
+</p>
+<pre>
+  ActiveRecord::Base.establish_connection(
+    :adapter  =&gt; &quot;mysql&quot;,
+    :host     =&gt; &quot;localhost&quot;,
+    :username =&gt; &quot;myuser&quot;,
+    :password =&gt; &quot;mypass&quot;,
+    :database =&gt; &quot;somedatabase&quot;
+  )
+</pre>
+<p>
+Example for SQLite database:
+</p>
+<pre>
+  ActiveRecord::Base.establish_connection(
+    :adapter =&gt; &quot;sqlite&quot;,
+    :dbfile  =&gt; &quot;path/to/dbfile&quot;
+  )
+</pre>
+<p>
+Also accepts keys as strings (for parsing from yaml for example):
+</p>
+<pre>
+  ActiveRecord::Base.establish_connection(
+    &quot;adapter&quot; =&gt; &quot;sqlite&quot;,
+    &quot;dbfile&quot;  =&gt; &quot;path/to/dbfile&quot;
+  )
+</pre>
+<p>
+The exceptions AdapterNotSpecified, AdapterNotFound and ArgumentError may
+be returned on an error.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000159-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000159-source">
+<pre>
+    <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 33</span>
+33:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">establish_connection</span>(<span class="ruby-identifier">config</span>)
+34:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">config</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdapterNotSpecified</span> <span class="ruby-keyword kw">end</span>
+35:       <span class="ruby-identifier">symbolize_strings_in_hash</span>(<span class="ruby-identifier">config</span>)
+36:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">config</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:adapter</span>) <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdapterNotSpecified</span> <span class="ruby-keyword kw">end</span>
+37:   
+38:       <span class="ruby-identifier">adapter_method</span> = <span class="ruby-node">&quot;#{config[:adapter]}_connection&quot;</span>
+39:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">methods</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">adapter_method</span>) <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdapterNotFound</span> <span class="ruby-keyword kw">end</span>
+40: 
+41:       @<span class="ruby-ivar">@config</span>, @<span class="ruby-ivar">@adapter_method</span> = <span class="ruby-identifier">config</span>, <span class="ruby-identifier">adapter_method</span>
+42:       <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>[<span class="ruby-value str">'connection'</span>] = <span class="ruby-keyword kw">nil</span>
+43:     <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- symbolize_strings_in_hash(hash) -->
+			<div id="method-M000160" class="method-detail">
+				<a name="M000160"></a>
+
+				<div class="method-heading">
+					<a href="#M000160" class="method-signature">
+					<span class="method-name">symbolize_strings_in_hash</span><span class="method-args">(hash)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Converts all strings in a hash to symbols.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000160-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000160-source">
+<pre>
+    <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 56</span>
+56:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">symbolize_strings_in_hash</span>(<span class="ruby-identifier">hash</span>)
+57:       <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
+58:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>
+59:           <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">key</span>
+60:           <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">key</span>.<span class="ruby-identifier">intern</span>] = <span class="ruby-identifier">value</span>
+61:         <span class="ruby-keyword kw">end</span>
+62:       <span class="ruby-keyword kw">end</span>
+63:     <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<!-- id() -->
+			<div id="method-M000146" class="method-detail">
+				<a name="M000146"></a>
+
+				<div class="method-heading">
+					<a href="#M000146" class="method-signature">
+					<span class="method-name">id</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Every Active Record class must use &quot;id&quot; as their primary ID. This
+getter overwrites the native id method, which isn&#8217;t being used in
+this context.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000146-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000146-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 514</span>
+514:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">id</span>
+515:         <span class="ruby-identifier">read_attribute</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">primary_key</span>)
+516:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- id=(value) -->
+			<div id="method-M000147" class="method-detail">
+				<a name="M000147"></a>
+
+				<div class="method-heading">
+					<a href="#M000147" class="method-signature">
+					<span class="method-name">id=</span><span class="method-args">(value)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Sets the primary ID.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000147-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000147-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 519</span>
+519:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">id=</span>(<span class="ruby-identifier">value</span>)
+520:         <span class="ruby-identifier">write_attribute</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">primary_key</span>, <span class="ruby-identifier">value</span>)
+521:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- new_record?() -->
+			<div id="method-M000148" class="method-detail">
+				<a name="M000148"></a>
+
+				<div class="method-heading">
+					<a href="#M000148" class="method-signature">
+					<span class="method-name">new_record?</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns true if this object hasn&#8217;t been saved yet &#8212; that is, a
+record for the object doesn&#8217;t exist yet.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000148-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000148-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 524</span>
+524:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">new_record?</span>
+525:         <span class="ruby-ivar">@new_record</span>
+526:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- save() -->
+			<div id="method-M000149" class="method-detail">
+				<a name="M000149"></a>
+
+				<div class="method-heading">
+					<a href="#M000149" class="method-signature">
+					<span class="method-name">save</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<ul>
+<li>No record exists: Creates a new record with values matching those of the
+object attributes.
+
+</li>
+<li>A record does exist: Updates the record with values matching those of the
+object attributes.
+
+</li>
+</ul>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000149-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000149-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 530</span>
+530:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">save</span>
+531:         <span class="ruby-identifier">create_or_update</span>
+532:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+533:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- destroy() -->
+			<div id="method-M000150" class="method-detail">
+				<a name="M000150"></a>
+
+				<div class="method-heading">
+					<a href="#M000150" class="method-signature">
+					<span class="method-name">destroy</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Deletes the record in the database and freezes this instance to reflect
+that no changes should be made (since they can&#8217;t be persisted).
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000150-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000150-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 537</span>
+537:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">destroy</span>
+538:         <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">new_record?</span>
+539:           <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">delete</span>(
+540:             <span class="ruby-node">&quot;DELETE FROM #{self.class.table_name} &quot;</span> <span class="ruby-operator">+</span> 
+541:             <span class="ruby-node">&quot;WHERE #{self.class.primary_key} = '#{id}'&quot;</span>, 
+542:             <span class="ruby-node">&quot;#{self.class.name} Destroy&quot;</span>
+543:           )
+544:         <span class="ruby-keyword kw">end</span>
+545: 
+546:         <span class="ruby-identifier">freeze</span>
+547:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- update_attribute(name, value) -->
+			<div id="method-M000151" class="method-detail">
+				<a name="M000151"></a>
+
+				<div class="method-heading">
+					<a href="#M000151" class="method-signature">
+					<span class="method-name">update_attribute</span><span class="method-args">(name, value)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Updates a single attribute and saves the record. This is especially useful
+for boolean flags on existing records.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000151-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000151-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 550</span>
+550:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update_attribute</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">value</span>)
+551:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">name</span> = <span class="ruby-identifier">value</span>
+552:         <span class="ruby-identifier">save</span>
+553:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- attributes=(attributes) -->
+			<div id="method-M000152" class="method-detail">
+				<a name="M000152"></a>
+
+				<div class="method-heading">
+					<a href="#M000152" class="method-signature">
+					<span class="method-name">attributes=</span><span class="method-args">(attributes)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Allows you to set all the attributes at once by passing in a hash with keys
+matching the attribute names (which again matches the column names).
+Sensitive attributes can be protected from this form of mass-assignment by
+using the <tt><a href="Base.html#M000137">attr_protected</a></tt> macro. Or
+you can alternatively specify which attributes <b>can</b> be accessed in
+with the <tt><a href="Base.html#M000138">attr_accessible</a></tt> macro.
+Then all the attributes not included in that won&#8217;t be allowed to be
+mass-assigned.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000152-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000152-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 560</span>
+560:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">attributes=</span>(<span class="ruby-identifier">attributes</span>)
+561:         <span class="ruby-identifier">remove_attributes_protected_from_mass_assignment</span>(<span class="ruby-identifier">attributes</span>)
+562: 
+563:         <span class="ruby-identifier">multi_parameter_attributes</span> = []
+564:         <span class="ruby-identifier">attributes</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> 
+565:           <span class="ruby-identifier">k</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value str">&quot;(&quot;</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">multi_parameter_attributes</span> <span class="ruby-operator">&lt;&lt;</span> [ <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span> ] <span class="ruby-operator">:</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">k</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span>, <span class="ruby-identifier">v</span>)
+566:         <span class="ruby-keyword kw">end</span>
+567:         <span class="ruby-identifier">assign_multiparameter_attributes</span>(<span class="ruby-identifier">multi_parameter_attributes</span>)
+568:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- attribute_present?(attribute) -->
+			<div id="method-M000153" class="method-detail">
+				<a name="M000153"></a>
+
+				<div class="method-heading">
+					<a href="#M000153" class="method-signature">
+					<span class="method-name">attribute_present?</span><span class="method-args">(attribute)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns true if the specified <tt>attribute</tt> has been set by the user
+or by a database load and is neither nil nor empty? (the latter only
+applies to objects that responds to empty?, most notably Strings).
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000153-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000153-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 572</span>
+572:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">attribute_present?</span>(<span class="ruby-identifier">attribute</span>)
+573:         <span class="ruby-identifier">is_empty</span> = <span class="ruby-identifier">read_attribute</span>(<span class="ruby-identifier">attribute</span>).<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value str">&quot;empty?&quot;</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">read_attribute</span>(<span class="ruby-identifier">attribute</span>).<span class="ruby-identifier">empty?</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>
+574:         <span class="ruby-ivar">@attributes</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">attribute</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@attributes</span>[<span class="ruby-identifier">attribute</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">is_empty</span>
+575:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- attribute_names() -->
+			<div id="method-M000154" class="method-detail">
+				<a name="M000154"></a>
+
+				<div class="method-heading">
+					<a href="#M000154" class="method-signature">
+					<span class="method-name">attribute_names</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of names for the attributes available on this object
+sorted alphabetically.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000154-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000154-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 578</span>
+578:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">attribute_names</span>
+579:         <span class="ruby-ivar">@attributes</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span>
+580:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- column_for_attribute(name) -->
+			<div id="method-M000155" class="method-detail">
+				<a name="M000155"></a>
+
+				<div class="method-heading">
+					<a href="#M000155" class="method-signature">
+					<span class="method-name">column_for_attribute</span><span class="method-args">(name)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the column object for the named attribute.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000155-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000155-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 583</span>
+583:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">column_for_attribute</span>(<span class="ruby-identifier">name</span>)
+584:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">columns_hash</span>[<span class="ruby-identifier">name</span>]
+585:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- ==(comparison_object) -->
+			<div id="method-M000156" class="method-detail">
+				<a name="M000156"></a>
+
+				<div class="method-heading">
+					<a href="#M000156" class="method-signature">
+					<span class="method-name">==</span><span class="method-args">(comparison_object)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns true if the <tt>comparison_object</tt> is of the same type and has
+the same id.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000156-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000156-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 588</span>
+588:       <span class="ruby-keyword kw">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">comparison_object</span>)
+589:         <span class="ruby-identifier">comparison_object</span>.<span class="ruby-identifier">instance_of?</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">comparison_object</span>.<span class="ruby-identifier">id</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span>
+590:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<h2 class="section-bar">Private Instance methods</h2>
+
+			<!-- read_attribute(attr_name) -->
+			<div id="method-M000157" class="method-detail">
+				<a name="M000157"></a>
+
+				<div class="method-heading">
+					<a href="#M000157" class="method-signature">
+					<span class="method-name">read_attribute</span><span class="method-args">(attr_name)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the value of attribute identified by <tt>attr_name</tt> after it
+has been type cast (for example, &quot;2004-12-12&quot; in a data column is
+cast to a date object, like Date.new(2004, 12, 12)). Can be used when
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000157-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000157-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 657</span>
+657:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read_attribute</span>(<span class="ruby-identifier">attr_name</span>) <span class="ruby-comment cmt">#:doc:</span>
+658:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">column</span> = <span class="ruby-identifier">column_for_attribute</span>(<span class="ruby-identifier">attr_name</span>)
+659:           <span class="ruby-ivar">@attributes</span>[<span class="ruby-identifier">attr_name</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">type_cast</span>(<span class="ruby-ivar">@attributes</span>[<span class="ruby-identifier">attr_name</span>])
+660:         <span class="ruby-keyword kw">end</span>
+661:         
+662:         <span class="ruby-ivar">@attributes</span>[<span class="ruby-identifier">attr_name</span>]
+663:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- write_attribute(attr_name, value) -->
+			<div id="method-M000158" class="method-detail">
+				<a name="M000158"></a>
+
+				<div class="method-heading">
+					<a href="#M000158" class="method-signature">
+					<span class="method-name">write_attribute</span><span class="method-args">(attr_name, value)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Updates the attribute identified by <tt>attr_name</tt> with the specified
+<tt>value</tt>.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000158-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000158-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/base.rb, line 666</span>
+666:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">write_attribute</span>(<span class="ruby-identifier">attr_name</span>, <span class="ruby-identifier">value</span>) <span class="ruby-comment cmt">#:doc:</span>
+667:         <span class="ruby-ivar">@attributes</span>[<span class="ruby-identifier">attr_name</span>] = <span class="ruby-identifier">value</span>
+668:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

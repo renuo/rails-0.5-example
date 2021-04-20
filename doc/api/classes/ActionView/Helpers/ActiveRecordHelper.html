@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Module: ActionView::Helpers::ActiveRecordHelper</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+	<script type="text/javascript">
+	// <![CDATA[
+
+	function popupCode( url ) {
+		window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+	}
+
+	function toggleCode( id ) {
+		if ( document.getElementById )
+			elem = document.getElementById( id );
+		else if ( document.all )
+			elem = eval( "document.all." + id );
+		else
+			return false;
+
+		elemStyle = elem.style;
+		
+		if ( elemStyle.display != "block" ) {
+			elemStyle.display = "block"
+		} else {
+			elemStyle.display = "none"
+		}
+
+		return true;
+	}
+	
+	// Make codeblocks hidden by default
+	document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+	
+	// ]]>
+	</script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <h1>ActionView::Helpers::ActiveRecordHelper <sup class="type-note">(Module)</sup></h1>
+        <table class="header-table">
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/vendor/actionpack/lib/action_view/helpers/active_record_helper_rb.html">
+                vendor/actionpack/lib/action_view/helpers/active_record_helper.rb
+                </a>
+				<br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+	<div id="bodyContent">
+
+
+	<div id="contextContent">
+
+		<div id="description">
+			<p>
+The Active Record Helper makes it easier to create forms for records kept
+in instance variables. The most far-reaching is the form method that
+creates a complete form for all the basic content types of the record (not
+associations or aggregations, though). This is a great of making the record
+quickly available for editing, but likely to prove lacklusters for a
+complicated real-world form. In that case, it&#8217;s better to use the
+input method and the specialized form methods in <a
+href="FormHelper.html">FormHelper.html</a>
+</p>
+
+		</div>
+
+
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000044">error_message_on</a>&nbsp;&nbsp;
+			<a href="#M000043">form</a>&nbsp;&nbsp;
+			<a href="#M000042">input</a>&nbsp;&nbsp;
+			</div>
+		</div>
+
+
+
+
+			
+
+	</div>
+
+
+
+		<!-- if includes -->
+
+
+		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<!-- input(record_name, method) -->
+			<div id="method-M000042" class="method-detail">
+				<a name="M000042"></a>
+
+				<div class="method-heading">
+					<a href="#M000042" class="method-signature">
+					<span class="method-name">input</span><span class="method-args">(record_name, method)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns a default input tag for the type of object returned by the method.
+Example (title is a VARCHAR column and holds &quot;Hello World&quot;):
+</p>
+<pre>
+  input(&quot;post&quot;, &quot;title&quot;) =&gt;
+    &lt;input id=&quot;post_title&quot; name=&quot;post[title]&quot; size=&quot;30&quot; type=&quot;text&quot; value=&quot;Hello World&quot; /&gt;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000042-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000042-source">
+<pre>
+    <span class="ruby-comment cmt"># File vendor/actionpack/lib/action_view/helpers/active_record_helper.rb, line 15</span>
+15:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">input</span>(<span class="ruby-identifier">record_name</span>, <span class="ruby-identifier">method</span>)
+16:         <span class="ruby-constant">InstanceTag</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">record_name</span>, <span class="ruby-identifier">method</span>, <span class="ruby-identifier">binding</span>).<span class="ruby-identifier">to_tag</span>
+17:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- form(record_name, options = {}) -->
+			<div id="method-M000043" class="method-detail">
+				<a name="M000043"></a>
+
+				<div class="method-heading">
+					<a href="#M000043" class="method-signature">
+					<span class="method-name">form</span><span class="method-args">(record_name, options = {})</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an entire form with input tags and everything for a specified
+Active Record object. Example (post is a new record that has a title using
+VARCHAR and a body using TEXT):
+</p>
+<pre>
+  form(&quot;post&quot;) =&gt;
+    &lt;form action='create' method='POST'&gt;
+      &lt;p&gt;
+        &lt;b&gt;Title&lt;/b&gt;&lt;br /&gt;
+        &lt;input id=&quot;post_title&quot; name=&quot;post[title]&quot; size=&quot;30&quot; type=&quot;text&quot; value=&quot;Hello World&quot; /&gt;
+      &lt;/p&gt;
+      &lt;p&gt;
+        &lt;b&gt;Body&lt;/b&gt;&lt;br /&gt;
+        &lt;textarea cols=&quot;40&quot; id=&quot;post_body&quot; name=&quot;post[body]&quot; rows=&quot;20&quot; wrap=&quot;virtual&quot;&gt;
+          Back to the hill and over it again!
+        &lt;/textarea&gt;
+      &lt;/p&gt;
+      &lt;input type='submit' value='Create' /&gt;
+    &lt;/form&gt;
+</pre>
+<p>
+It&#8217;s possible to specialize the form builder by using a different
+action name and by supplying another block renderer. Example (entry is a
+new record that has a message attribute using VARCHAR):
+</p>
+<pre>
+  form(&quot;entry&quot;, :action =&gt; &quot;sign&quot;, :input_block =&gt;
+       Proc.new { |record, column| &quot;#{column.human_name}: #{input(record, column.name)}&lt;br /&gt;&quot; }) =&gt;
+
+    &lt;form action='sign' method='POST'&gt;
+      Message:
+      &lt;input id=&quot;post_title&quot; name=&quot;post[title]&quot; size=&quot;30&quot; type=&quot;text&quot; value=&quot;Hello World&quot; /&gt;&lt;br /&gt;
+      &lt;input type='submit' value='Sign' /&gt;
+    &lt;/form&gt;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000043-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000043-source">
+<pre>
+    <span class="ruby-comment cmt"># File vendor/actionpack/lib/action_view/helpers/active_record_helper.rb, line 47</span>
+47:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">form</span>(<span class="ruby-identifier">record_name</span>, <span class="ruby-identifier">options</span> = {})
+48:         <span class="ruby-identifier">record</span>   = <span class="ruby-identifier">instance_eval</span>(<span class="ruby-node">&quot;@#{record_name}&quot;</span>)
+49:         <span class="ruby-identifier">action</span>   = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:action</span>] <span class="ruby-operator">||</span> (<span class="ruby-identifier">record</span>.<span class="ruby-identifier">new_record?</span> <span class="ruby-value">? </span><span class="ruby-value str">&quot;create&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;update&quot;</span>)
+50:         <span class="ruby-identifier">id_field</span> = <span class="ruby-identifier">record</span>.<span class="ruby-identifier">new_record?</span> <span class="ruby-value">? </span><span class="ruby-value str">&quot;&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-constant">InstanceTag</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">record_name</span>, <span class="ruby-value str">&quot;id&quot;</span>, <span class="ruby-identifier">binding</span>).<span class="ruby-identifier">to_input_field_tag</span>(<span class="ruby-value str">&quot;hidden&quot;</span>)
+51: 
+52:         <span class="ruby-node">&quot;&lt;form action='#{action}' method='POST'&gt;&quot;</span> <span class="ruby-operator">+</span>
+53:         <span class="ruby-identifier">id_field</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">all_input_tags</span>(<span class="ruby-identifier">record</span>, <span class="ruby-identifier">record_name</span>, <span class="ruby-identifier">options</span>) <span class="ruby-operator">+</span>
+54:         <span class="ruby-node">&quot;&lt;input type='submit' value='#{action.gsub(/[^A-Za-z]/, &quot;&quot;).capitalize}' /&gt;&quot;</span> <span class="ruby-operator">+</span>
+55:         <span class="ruby-value str">&quot;&lt;/form&gt;&quot;</span>
+56:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- error_message_on(object, method, prepend_text = &quot;&quot;, append_text = &quot;&quot;, css_class = &quot;formError&quot;) -->
+			<div id="method-M000044" class="method-detail">
+				<a name="M000044"></a>
+
+				<div class="method-heading">
+					<a href="#M000044" class="method-signature">
+					<span class="method-name">error_message_on</span><span class="method-args">(object, method, prepend_text = &quot;&quot;, append_text = &quot;&quot;, css_class = &quot;formError&quot;)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns a string containing the error message attached to the
+<tt>method</tt> on the <tt>object</tt>, if one exists. This error message
+is wrapped in a DIV tag, which can be specialized to include both a
+<tt>prepend_text</tt> and <tt>append_text</tt> to properly introduce the
+error and a <tt>css_class</tt> to style it accordingly. Examples (post has
+an error message &quot;can&#8217;t be empty&quot; on the title attribute):
+</p>
+<pre>
+  &lt;%= error_message_on &quot;post&quot;, &quot;title&quot; %&gt; =&gt;
+    &lt;div class=&quot;formError&quot;&gt;can't be empty&lt;/div&gt;
+
+  &lt;%= error_message_on &quot;post&quot;, &quot;title&quot;, &quot;Title simply &quot;, &quot; (or it won't work)&quot;, &quot;inputError&quot; %&gt; =&gt;
+    &lt;div class=&quot;inputError&quot;&gt;Title simply can't be empty (or it won't work)&lt;/div&gt;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000044-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000044-source">
+<pre>
+    <span class="ruby-comment cmt"># File vendor/actionpack/lib/action_view/helpers/active_record_helper.rb, line 68</span>
+68:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">error_message_on</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">method</span>, <span class="ruby-identifier">prepend_text</span> = <span class="ruby-value str">&quot;&quot;</span>, <span class="ruby-identifier">append_text</span> = <span class="ruby-value str">&quot;&quot;</span>, <span class="ruby-identifier">css_class</span> = <span class="ruby-value str">&quot;formError&quot;</span>)
+69:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-node">&quot;@#{object}&quot;</span>).<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-identifier">method</span>)
+70:           <span class="ruby-node">&quot;&lt;div class=\&quot;#{css_class}\&quot;&gt;#{prepend_text + instance_eval(&quot;@#{object}&quot;).errors.on(method) + append_text}&lt;/div&gt;&quot;</span>
+71:         <span class="ruby-keyword kw">end</span>
+72:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

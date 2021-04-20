@@ -1,0 +1,1 @@
+../vendor/railties/helpers/unit_test_helper.rb

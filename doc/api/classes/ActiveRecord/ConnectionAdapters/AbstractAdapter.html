@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Class: ActiveRecord::ConnectionAdapters::AbstractAdapter</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+	<script type="text/javascript">
+	// <![CDATA[
+
+	function popupCode( url ) {
+		window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+	}
+
+	function toggleCode( id ) {
+		if ( document.getElementById )
+			elem = document.getElementById( id );
+		else if ( document.all )
+			elem = eval( "document.all." + id );
+		else
+			return false;
+
+		elemStyle = elem.style;
+		
+		if ( elemStyle.display != "block" ) {
+			elemStyle.display = "block"
+		} else {
+			elemStyle.display = "none"
+		}
+
+		return true;
+	}
+	
+	// Make codeblocks hidden by default
+	document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+	
+	// ]]>
+	</script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <h1>ActiveRecord::ConnectionAdapters::AbstractAdapter <sup class="type-note">(Class)</sup></h1>
+        <table class="header-table">
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter_rb.html">
+                vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb
+                </a>
+				<br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+	<div id="bodyContent">
+
+
+	<div id="contextContent">
+
+		<div id="description">
+			<p>
+All the concrete database adapters follow the interface laid down in this
+class. You can use this interface directly by borrowing the database
+connection from the <a href="../Base.html">Base</a> with Base.connection.
+</p>
+
+		</div>
+
+
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000081">begin_db_transaction</a>&nbsp;&nbsp;
+			<a href="#M000077">columns</a>&nbsp;&nbsp;
+			<a href="#M000082">commit_db_transaction</a>&nbsp;&nbsp;
+			<a href="#M000080">delete</a>&nbsp;&nbsp;
+			<a href="#M000078">insert</a>&nbsp;&nbsp;
+			<a href="#M000083">rollback_db_transaction</a>&nbsp;&nbsp;
+			<a href="#M000075">select_all</a>&nbsp;&nbsp;
+			<a href="#M000076">select_one</a>&nbsp;&nbsp;
+			<a href="#M000084">structure_dump</a>&nbsp;&nbsp;
+			<a href="#M000079">update</a>&nbsp;&nbsp;
+			</div>
+		</div>
+
+
+
+
+			
+
+	</div>
+
+
+
+		<!-- if includes -->
+		<div id="includes">
+			<h2 class="section-bar">Included Modules</h2>
+
+			<div id="includes-list">
+		    <span class="include-name">Benchmark</span>
+			</div>
+		</div>
+
+
+		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<!-- select_all(sql, name = nil) -->
+			<div id="method-M000075" class="method-detail">
+				<a name="M000075"></a>
+
+				<div class="method-heading">
+					<a href="#M000075" class="method-signature">
+					<span class="method-name">select_all</span><span class="method-args">(sql, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of record hashes with the column names as a keys and
+fields as values.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000075-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000075-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 177</span>
+177:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">select_all</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- select_one(sql, name = nil) -->
+			<div id="method-M000076" class="method-detail">
+				<a name="M000076"></a>
+
+				<div class="method-heading">
+					<a href="#M000076" class="method-signature">
+					<span class="method-name">select_one</span><span class="method-args">(sql, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns a record hash with the column names as a keys and fields as values.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000076-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000076-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 180</span>
+180:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">select_one</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- columns(table_name, name = nil) -->
+			<div id="method-M000077" class="method-detail">
+				<a name="M000077"></a>
+
+				<div class="method-heading">
+					<a href="#M000077" class="method-signature">
+					<span class="method-name">columns</span><span class="method-args">(table_name, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns an array of column objects for the table specified by
+<tt>table_name</tt>.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000077-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000077-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 183</span>
+183:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-identifier">table_name</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- insert(sql, name = nil) -->
+			<div id="method-M000078" class="method-detail">
+				<a name="M000078"></a>
+
+				<div class="method-heading">
+					<a href="#M000078" class="method-signature">
+					<span class="method-name">insert</span><span class="method-args">(sql, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns the last auto-generated ID from the affected table.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000078-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000078-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 186</span>
+186:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- update(sql, name = nil) -->
+			<div id="method-M000079" class="method-detail">
+				<a name="M000079"></a>
+
+				<div class="method-heading">
+					<a href="#M000079" class="method-signature">
+					<span class="method-name">update</span><span class="method-args">(sql, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Executes the update statement.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000079-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000079-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 189</span>
+189:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- delete(sql, name = nil) -->
+			<div id="method-M000080" class="method-detail">
+				<a name="M000080"></a>
+
+				<div class="method-heading">
+					<a href="#M000080" class="method-signature">
+					<span class="method-name">delete</span><span class="method-args">(sql, name = nil)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Executes the delete statement.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000080-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000080-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 192</span>
+192:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">delete</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>) <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- begin_db_transaction() -->
+			<div id="method-M000081" class="method-detail">
+				<a name="M000081"></a>
+
+				<div class="method-heading">
+					<a href="#M000081" class="method-signature">
+					<span class="method-name">begin_db_transaction</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Begins the transaction (and turns off auto-committing).
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000081-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000081-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 201</span>
+201:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">begin_db_transaction</span>()    <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- commit_db_transaction() -->
+			<div id="method-M000082" class="method-detail">
+				<a name="M000082"></a>
+
+				<div class="method-heading">
+					<a href="#M000082" class="method-signature">
+					<span class="method-name">commit_db_transaction</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Commits the transaction (and turns on auto-committing).
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000082-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000082-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 204</span>
+204:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commit_db_transaction</span>()   <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- rollback_db_transaction() -->
+			<div id="method-M000083" class="method-detail">
+				<a name="M000083"></a>
+
+				<div class="method-heading">
+					<a href="#M000083" class="method-signature">
+					<span class="method-name">rollback_db_transaction</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Rollsback the transaction (and turns on auto-committing). Must be done if
+the transaction block raises an exception or returns false.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000083-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000083-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 208</span>
+208:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rollback_db_transaction</span>() <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- structure_dump() -->
+			<div id="method-M000084" class="method-detail">
+				<a name="M000084"></a>
+
+				<div class="method-heading">
+					<a href="#M000084" class="method-signature">
+					<span class="method-name">structure_dump</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Returns a string of the CREATE TABLE SQL statements for recreating the
+entire structure of the database.
+</p>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000084-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000084-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb, line 211</span>
+211:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">structure_dump</span>() <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

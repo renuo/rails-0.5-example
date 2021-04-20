@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>File: README</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+	<script type="text/javascript">
+	// <![CDATA[
+
+	function popupCode( url ) {
+		window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+	}
+
+	function toggleCode( id ) {
+		if ( document.getElementById )
+			elem = document.getElementById( id );
+		else if ( document.all )
+			elem = eval( "document.all." + id );
+		else
+			return false;
+
+		elemStyle = elem.style;
+		
+		if ( elemStyle.display != "block" ) {
+			elemStyle.display = "block"
+		} else {
+			elemStyle.display = "none"
+		}
+
+		return true;
+	}
+	
+	// Make codeblocks hidden by default
+	document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+	
+	// ]]>
+	</script>
+
+</head>
+<body>
+
+
+
+	<div id="fileHeader">
+		<h1>README</h1>
+		<table class="header-table">
+		<tr class="top-aligned-row">
+			<td><strong>Path:</strong></td>
+			<td>README
+			</td>
+		</tr>
+		<tr class="top-aligned-row">
+			<td><strong>Last Update:</strong></td>
+			<td>Sun Jul 25 01:27:31 CEST 2004</td>
+		</tr>
+		</table>
+	</div>
+  <!-- banner header -->
+
+	<div id="bodyContent">
+
+
+	<div id="contextContent">
+
+		<div id="description">
+			<h2>Welcome to Rails</h2>
+<p>
+Rails is a web-application and persistance framework that includes
+everything needed to create database-backed web-applications according to
+the Model-View-Control pattern of separation. This pattern splits the view
+(also called the presentation) into &quot;dumb&quot; templates that are
+primarily responsible for inserting pre-build data in between HTML tags.
+The model contains the &quot;smart&quot; domain objects (such as Account,
+Product, Person, Post) that holds all the business logic and knows how to
+persist themselves to a database. The controller handles the incoming
+requests (such as Save New Account, Update Product, Show Post) by
+manipulating the model and directing data to the view.
+</p>
+<p>
+In Rails, the model is handled by what&#8217;s called a object-relational
+mapping layer entitled Active Record. This layer allows you to present the
+data from database rows as objects and embellish these data objects with
+business logic methods. You can read more about Active Record in <a
+href="vendor/activerecord/README.html">vendor/activerecord/README.html</a>.
+</p>
+<p>
+The controller and view is handled by the Action Pack, which handles both
+layers by its two parts: Action View and Action Controller. These two
+layers are bundled in a single package due to their heavy interdependence.
+This is unlike the relationship between the Active Record and Action Pack
+that is much more separate. Each of these packages can be used
+independently outside of Rails. You can read more about Action Pack in <a
+href="vendor/actionpack/README.html">vendor/actionpack/README.html</a>.
+</p>
+<h2>Requirements</h2>
+<ul>
+<li>Apache 1.3.x or 2.x (or any FastCGI-capable webserver with a
+mod_rewrite-like module)
+
+</li>
+<li>FastCGI (or mod_ruby) for production performance (CGI is used for
+development)
+
+</li>
+<li>Database and driver (MySQL, PostgreSQL, or SQLite)
+
+</li>
+</ul>
+<h2>Getting started</h2>
+<ol>
+<li>Setup Apache for the Rails application (see &quot;Example for Apache
+conf&quot;)
+
+</li>
+<li>Go to <a href="http://rails">rails</a>/ (or whatever is your ServerName)
+and check that you get the &quot;Congratulations, you&#8217;re on
+Rails!&quot; screen
+
+</li>
+<li>Follow the guidelines on the &quot;Congratulations, you&#8217;re on
+Rails!&quot; screen
+
+</li>
+</ol>
+<h2>Example for Apache conf</h2>
+<pre>
+  &lt;VirtualHost *:80&gt;
+    ServerName rails
+    DocumentRoot /path/tapplication/public/
+    ErrorLog /path/application/log/apache.log
+
+    &lt;Directory /path/application/public/&gt;
+      Options ExecCGI FollowSymLinks
+      AllowOverride all
+    &lt;/Directory&gt;
+  &lt;/VirtualHost&gt;
+</pre>
+<p>
+NOTE: Be sure that CGIs can be executed in that directory as well. So
+ExecCGI should be on and &quot;.cgi&quot; should respond. All requests from
+127.0.0.1 goes through CGI, so no Apache restart is necessary for changes.
+All other requests goes through FCGI (or mod_ruby) that requires restart to
+show changes.
+</p>
+<h2>Debugging Rails</h2>
+<p>
+Have &quot;tail -f&quot; commands running on both the apache.log,
+production.log, and test.log files. Rails will automatically display
+debugging and runtime information to these files. Debugging info will also
+be shown in the browser on requests from 127.0.0.1.
+</p>
+<h2>Description of contents</h2>
+<p>
+app
+</p>
+<pre>
+  Holds all the code that's specific to this particular application.
+</pre>
+<p>
+app/controllers
+</p>
+<pre>
+  Holds controllers that should be named like weblog_controller.rb for
+  automated URL mapping. All controllers should descent from
+  ActionController::Base.
+</pre>
+<p>
+app/models
+</p>
+<pre>
+  Holds models that should be named like post.rb.
+  Most models will descent from ActiveRecord::Base.
+</pre>
+<p>
+app/views
+</p>
+<pre>
+  Holds the template files for the view that should be named like
+  weblog/index.rhtml for the WeblogController#index action. All views uses eRuby
+  syntax. This directory can also be used to keep stylesheets, images, and so on
+  that can be symlinked to public.
+</pre>
+<p>
+app/helpers
+</p>
+<pre>
+  Holds view helpers that should be named like weblog_helper.rb.
+</pre>
+<p>
+config
+</p>
+<pre>
+  Configuration files for Apache, database, and other dependencies.
+</pre>
+<p>
+public
+</p>
+<pre>
+  The directory available for Apache, which includes symbolic links to other
+  parts of the structure that are to be made available. Refrain from placing
+  actual files in here if you're using CVS and don't want to check in this
+  directory.
+</pre>
+<p>
+script
+</p>
+<pre>
+  Helper scripts for automation and generation.
+</pre>
+<p>
+test
+</p>
+<pre>
+  Unit and functional tests along with fixtures.
+</pre>
+<p>
+vendor
+</p>
+<pre>
+  External libraries that the application depend on.
+</pre>
+
+		</div>
+
+
+
+
+
+
+			
+
+	</div>
+
+
+
+		<!-- if includes -->
+
+
+		<!-- if method_list -->
+
+
+	</div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

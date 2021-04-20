@@ -1,0 +1,864 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Module: ActiveRecord::Associations::ClassMethods</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+	<script type="text/javascript">
+	// <![CDATA[
+
+	function popupCode( url ) {
+		window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+	}
+
+	function toggleCode( id ) {
+		if ( document.getElementById )
+			elem = document.getElementById( id );
+		else if ( document.all )
+			elem = eval( "document.all." + id );
+		else
+			return false;
+
+		elemStyle = elem.style;
+		
+		if ( elemStyle.display != "block" ) {
+			elemStyle.display = "block"
+		} else {
+			elemStyle.display = "none"
+		}
+
+		return true;
+	}
+	
+	// Make codeblocks hidden by default
+	document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+	
+	// ]]>
+	</script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <h1>ActiveRecord::Associations::ClassMethods <sup class="type-note">(Module)</sup></h1>
+        <table class="header-table">
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/vendor/activerecord/lib/active_record/associations_rb.html">
+                vendor/activerecord/lib/active_record/associations.rb
+                </a>
+				<br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+	<div id="bodyContent">
+
+
+	<div id="contextContent">
+
+		<div id="description">
+			<p>
+Associations are a set of macro-like class methods for tying objects
+together through foreign keys. They express relationships like
+&quot;Project has one Project Manager&quot; or &quot;Project belongs to a
+Portfolio&quot;. Each macro adds a number of methods to the class which are
+specialized according to the collection or association symbol and the
+options hash. It works much the same was as Ruby&#8217;s own attr* methods.
+Example:
+</p>
+<pre>
+  class Project &lt; ActiveRecord::Base
+    belongs_to              :portfolio
+    has_one                 :project_manager
+    has_many                :milestones
+    has_and_belongs_to_many :categories
+  end
+</pre>
+<p>
+The project class now has the following methods to ease the traversel and
+manipulation of its relationships:
+</p>
+<ul>
+<li><tt>Project#portfolio, Project#portfolio=(portfolio),
+Project#has_portfolio?, Project#portfolio?(portfolio),</tt>
+<tt>Project#build_portfolio, Project#create_portfolio</tt>
+
+</li>
+<li><tt>Project#project_manager, Project#project_manager=(project_manager),
+Project#has_project_manger?,</tt>
+<tt>Project#project_manager?(project_manager),
+Project#build_project_manager, Project#create_project_manager</tt>
+
+</li>
+<li><tt>Project#has_milestones?, Project#milestones_count, Project#milestones,
+Project#milestones&lt;&lt;(milestone),
+Project#find_in_milestones(milestone_id), Project#build_to_milestones,
+Project#create_in_milestones&lt;</tt>
+
+</li>
+<li><tt>Project#has_categories?, Project#categories_count, Project#categories,
+Project#add_categories(category1, category2), </tt>
+<tt>Project#remove_categories(category1)</tt>
+
+</li>
+</ul>
+<h2>Caching</h2>
+<p>
+All of the methods are built on a simple caching principle that will keep
+the result of the last query around unless specifically instructed not to.
+The cache is even shared across methods to make it even cheaper to use the
+macro-added methods without worrying too much about performance at the
+first go. Example:
+</p>
+<pre>
+  project.milestones             # fetches milestones from the database
+  project.milestones_count       # uses the milestone cache
+  project.has_milestones?        # uses the milestone cache
+  project.milestones_count(true) # fetches milestones from the database
+  project.milestones             # uses the milestone cache
+</pre>
+<h2>Modules</h2>
+<p>
+By default, associations will look for objects within the current module
+scope. Consider:
+</p>
+<pre>
+  module MyApplication
+    module Business
+      class Firm &lt; ActiveRecord::Base
+         has_many :clients
+       end
+
+      class Company &lt; ActiveRecord::Base; end
+    end
+  end
+</pre>
+<p>
+When Firm#clients is called, it&#8217;ll in turn call
+<tt>MyApplication::Business::Company.find(firm.id)</tt>. If you want to
+associate with a class in another module scope this can be done by
+specifying the complete class name, such as:
+</p>
+<pre>
+  module MyApplication
+    module Business
+      class Firm &lt; ActiveRecord::Base; end
+    end
+
+    module Billing
+      class Account &lt; ActiveRecord::Base
+        belongs_to :firm, :class_name =&gt; &quot;MyApplication::Business::Firm&quot;
+      end
+    end
+  end
+</pre>
+<h2>Options</h2>
+<p>
+All of the association macros can be specialized through options which
+makes more complex cases than the simple and guessable ones possible.
+</p>
+
+		</div>
+
+
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000063">belongs_to</a>&nbsp;&nbsp;
+			<a href="#M000064">has_and_belongs_to_many</a>&nbsp;&nbsp;
+			<a href="#M000061">has_many</a>&nbsp;&nbsp;
+			<a href="#M000062">has_one</a>&nbsp;&nbsp;
+			</div>
+		</div>
+
+
+
+
+			
+
+	</div>
+
+
+
+		<!-- if includes -->
+
+
+		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<!-- has_many(collection_id, options = {}) -->
+			<div id="method-M000061" class="method-detail">
+				<a name="M000061"></a>
+
+				<div class="method-heading">
+					<a href="#M000061" class="method-signature">
+					<span class="method-name">has_many</span><span class="method-args">(collection_id, options = {})</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Adds the following methods for retrival and query of collections of
+associated objects. <tt>collection</tt> is replaced with the symbol passed
+as the first argument, so <tt><a
+href="ClassMethods.html#M000061">has_many</a> :clients</tt> would add among
+others <tt>has_clients?</tt>.
+</p>
+<ul>
+<li><tt>collection(force_reload = false)</tt> - returns an array of all the
+associated objects. An empty array is returned if none is found.
+
+</li>
+<li><tt>collection&lt;&lt;(object)</tt> - adds the object to the collection (by
+setting the foreign key on it) and saves it.
+
+</li>
+<li><tt>has_collection?(force_reload = false)</tt> - returns true if
+there&#8217;s any associated objects.
+
+</li>
+<li><tt>collection_count(force_reload = false)</tt> - returns the number of
+associated objects.
+
+</li>
+<li><tt>find_in_collection(id)</tt> - finds an associated object responding to
+the <tt>id</tt> and that meets the condition that it has to be associated
+with this object.
+
+</li>
+<li><tt>build_to_collection(attributes = {})</tt> - returns a new object of the
+collection type that has been instantiated with <tt>attributes</tt> and
+linked to this object through a foreign key but has not yet been saved.
+
+</li>
+<li><tt>create_in_collection(attributes = {})</tt> - returns a new object of
+the collection type that has been instantiated with <tt>attributes</tt> and
+linked to this object through a foreign key and that has already been saved
+(if it passed the validation).
+
+</li>
+</ul>
+<p>
+Example: A Firm class declares <tt><a
+href="ClassMethods.html#M000061">has_many</a> :clients</tt>, which will
+add:
+</p>
+<ul>
+<li><tt>Firm#clients</tt> (similar to <tt>Clients.find_all &quot;firm_id =
+#{id}&quot;</tt>)
+
+</li>
+<li><tt>Firm#has_clients?</tt> (similar to <tt>firm.clients.length &gt; 0</tt>)
+
+</li>
+<li><tt>Firm#clients_count</tt> (similar to <tt>Client.count &quot;firm_id =
+#{id}&quot;</tt>)
+
+</li>
+<li><tt>Firm#find_in_clients</tt> (similar to <tt>Client.find_on_conditions(id,
+&quot;firm_id = #{id}&quot;</tt>)
+
+</li>
+<li><tt>Firm#build_to_clients</tt> (similar to
+<tt>Client.new(&quot;firm_id&quot; =&gt; id)</tt>)
+
+</li>
+<li><tt>Firm#create_in_clients</tt> (similar to <tt>c =
+Client.new(&quot;client_id&quot; =&gt; id); c.save; c</tt>)
+
+</li>
+</ul>
+<p>
+The declaration can also include an options hash to specialize the
+generated methods.
+</p>
+<p>
+Options are:
+</p>
+<ul>
+<li><tt>:class_name</tt> - specify the class name of the association. Use it
+only if that name can&#8217;t be infered from the association name. So
+<tt><a href="ClassMethods.html#M000061">has_many</a> :products</tt> will by
+default be linked to the <tt>Product</tt> class, but if the real class name
+is <tt>SpecialProduct</tt>, you&#8217;ll have to specify it with this
+option.
+
+</li>
+<li><tt>:conditions</tt> - specify the conditions that the associated objects
+must meet in order to be included as a &quot;WHERE&quot; sql fragment, such
+as &quot;price &gt; 5 AND name LIKE &#8216;B%&#8217;&quot;.
+
+</li>
+<li><tt>:order</tt> - specify the order in which the associated objects are
+returned as a &quot;ORDER BY&quot; sql fragment, such as &quot;last_name,
+first_name DESC&quot;
+
+</li>
+<li><tt>:foreign_key</tt> - specify the foreign key used for the association.
+By default this is guessed to be the name of this class in lower-case and
+&quot;_id&quot; suffixed. So a <tt>Person</tt> class that makes a <a
+href="ClassMethods.html#M000061">has_many</a> association will use
+&quot;person_id&quot; as the default foreign_key.
+
+</li>
+<li><tt>:dependent</tt> - if set to true all the associated object are
+destroyed alongside this object
+
+</li>
+<li><tt>:finder_sql</tt> - specify a complete SQL statement to fetch the
+association. This is a good way to go for complex associations that depends
+on multiple tables. Note: When this option is used,
+<tt>find_in_collection</tt> is <em>not</em> added.
+
+</li>
+</ul>
+<p>
+Option examples:
+</p>
+<pre>
+  has_many :comments, :order =&gt; &quot;posted_on&quot;
+  has_many :people, :class_name =&gt; &quot;Person&quot;, :conditions =&gt; &quot;deleted = 0&quot;, :order =&gt; &quot;name&quot;
+  has_many :tracks, :order =&gt; &quot;position&quot;, :dependent =&gt; true
+  has_many :subscribers, :class_name =&gt; &quot;Person&quot;, :finder_sql =&gt;
+      'SELECT DISTINCT people.* ' +
+      'FROM people p, post_subscriptions ps ' +
+      'WHERE ps.post_id = #{id} AND ps.person_id = p.id ' +
+      'ORDER BY p.first_name'
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000061-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000061-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/associations.rb, line 124</span>
+124:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_many</span>(<span class="ruby-identifier">collection_id</span>, <span class="ruby-identifier">options</span> = {})
+125:         <span class="ruby-identifier">validate_options</span>([ <span class="ruby-identifier">:foreign_key</span>, <span class="ruby-identifier">:class_name</span>, <span class="ruby-identifier">:dependent</span>, <span class="ruby-identifier">:conditions</span>, <span class="ruby-identifier">:order</span>, <span class="ruby-identifier">:finder_sql</span> ], <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>)
+126: 
+127:         <span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span> =
+128:             <span class="ruby-identifier">associate_identification</span>(<span class="ruby-identifier">collection_id</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class_name</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:foreign_key</span>])
+129: 
+130:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:finder_sql</span>]
+131:           <span class="ruby-identifier">counter_sql</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:finder_sql</span>].<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/SELECT (.*) FROM/</span>, <span class="ruby-value str">&quot;SELECT COUNT(*) FROM&quot;</span>)
+132: 
+133:           <span class="ruby-identifier">collection_finder</span>  = <span class="ruby-node">&quot;#{collection_class_name}.find_by_sql(\&quot;#{options[:finder_sql]}\&quot;)&quot;</span>
+134:           <span class="ruby-identifier">collection_counter</span> = <span class="ruby-node">&quot;#{collection_class_name}.count_by_sql(\&quot;#{counter_sql}\&quot;)&quot;</span>
+135:         <span class="ruby-keyword kw">else</span>
+136:           <span class="ruby-identifier">collection_finder</span> = <span class="ruby-value str">&quot;\#{collection_class_name}.find_all(\n\&quot;\#{class_primary_key_name} = '\\\#{id}'\#{options[:conditions] ? \&quot; AND \&quot; + options[:conditions] : \&quot;\&quot;}\&quot;,\n\#{options[:order] ? \&quot;\\\&quot;\&quot; + options[:order] + \&quot;\\\&quot;\&quot; : \&quot;nil\&quot; }\n)\n&quot;</span>
+137:           
+138:           <span class="ruby-identifier">collection_counter</span> = <span class="ruby-node">&quot;#{collection_class_name}.count(\&quot;#{class_primary_key_name} = '\#{id}'\&quot;)&quot;</span>
+139:         <span class="ruby-keyword kw">end</span>
+140:         
+141:         <span class="ruby-identifier">has_collection_method</span>(<span class="ruby-identifier">collection_name</span>)
+142:         <span class="ruby-identifier">collection_count_method</span>(<span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_counter</span>)
+143:         <span class="ruby-identifier">collection_accessor_method</span>(<span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_finder</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+144:                                 
+145:         <span class="ruby-identifier">build_method</span>(<span class="ruby-value str">&quot;build_to_&quot;</span>, <span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+146:         <span class="ruby-identifier">create_method</span>(<span class="ruby-value str">&quot;create_in_&quot;</span>, <span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+147: 
+148:         <span class="ruby-comment cmt"># Can't use constrained finds with specialized finder SQL</span>
+149:         <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:finder_sql</span>]
+150:           <span class="ruby-identifier">find_in_collection_method</span>(<span class="ruby-identifier">collection_name</span>, <span class="ruby-identifier">collection_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:conditions</span>])
+151:         <span class="ruby-keyword kw">end</span>
+152: 
+153:         <span class="ruby-identifier">module_eval</span> <span class="ruby-node">&quot;before_destroy '#{collection_name}.each { |o| o.destroy }'&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:dependent</span>]
+154:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- has_one(association_id, options = {}) -->
+			<div id="method-M000062" class="method-detail">
+				<a name="M000062"></a>
+
+				<div class="method-heading">
+					<a href="#M000062" class="method-signature">
+					<span class="method-name">has_one</span><span class="method-args">(association_id, options = {})</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Adds the following methods for retrival and query of a single associated
+object. <tt>association</tt> is replaced with the symbol passed as the
+first argument, so <tt><a href="ClassMethods.html#M000062">has_one</a>
+:manager</tt> would add among others <tt>has_manager?</tt>.
+</p>
+<ul>
+<li><tt>association(force_reload = false)</tt> - returns the associated object.
+Nil is returned if none is found.
+
+</li>
+<li><tt>association=(associate)</tt> - assigns the associate object, extracts
+the primary key, sets it as the foreign key, and saves the associate
+object.
+
+</li>
+<li><tt>association?(object, force_reload = false)</tt> - returns true if the
+<tt>object</tt> is of the same type and has the same id as the associated
+object.
+
+</li>
+<li><tt>has_association?(force_reload = false)</tt> - returns true if
+there&#8217;s an associated object.
+
+</li>
+<li><tt>build_association(attributes = {})</tt> - returns a new object of the
+associated type that has been instantiated with <tt>attributes</tt> and
+linked to this object through a foreign key but has not yet been saved.
+
+</li>
+<li><tt>create_association(attributes = {})</tt> - returns a new object of the
+associated type that has been instantiated with <tt>attributes</tt> and
+linked to this object through a foreign key and that has already been saved
+(if it passed the validation).
+
+</li>
+</ul>
+<p>
+Example: An Account class declares <tt><a
+href="ClassMethods.html#M000062">has_one</a> :beneficiary</tt>, which will
+add:
+</p>
+<ul>
+<li><tt>Account#beneficiary</tt> (similar to <tt>Beneficiary.find_first
+&quot;account_id = #{id}&quot;</tt>)
+
+</li>
+<li><tt>Account#beneficiary=(beneficiary)</tt> (similar to
+<tt>beneficiary.account_id = account.id; beneficiary.save</tt>)
+
+</li>
+<li><tt>Account#beneficiary?</tt> (similar to <tt>account.beneficiary ==
+some_beneficiary</tt>)
+
+</li>
+<li><tt>Account#has_beneficiary?</tt> (similar to
+<tt>!account.beneficiary.nil?</tt>)
+
+</li>
+<li><tt>Account#build_beneficiary</tt> (similar to
+<tt>Beneficiary.new(&quot;account_id&quot; =&gt; id)</tt>)
+
+</li>
+<li><tt>Account#create_beneficiary</tt> (similar to <tt>b =
+Beneficiary.new(&quot;account_id&quot; =&gt; id); b.save; b</tt>)
+
+</li>
+</ul>
+<p>
+The declaration can also include an options hash to specialize the
+generated methods.
+</p>
+<p>
+Options are:
+</p>
+<ul>
+<li><tt>:class_name</tt> - specify the class name of the association. Use it
+only if that name can&#8217;t be infered from the association name. So
+<tt><a href="ClassMethods.html#M000062">has_one</a> :manager</tt> will by
+default be linked to the <tt>Manager</tt> class, but if the real class name
+is <tt>Person</tt>, you&#8217;ll have to specify it with this option.
+
+</li>
+<li><tt>:conditions</tt> - specify the conditions that the associated object
+must meet in order to be included as a &quot;WHERE&quot; sql fragment, such
+as &quot;rank = 5&quot;.
+
+</li>
+<li><tt>:order</tt> - specify the order from which the associated object will
+be picked at the top. Specified as
+
+<pre>
+ an &quot;ORDER BY&quot; sql fragment, such as &quot;last_name, first_name DESC&quot;
+</pre>
+</li>
+<li><tt>:dependent</tt> - if set to true the associated object is destroyed
+alongside this object
+
+</li>
+<li><tt>:foreign_key</tt> - specify the foreign key used for the association.
+By default this is guessed to be the name of this class in lower-case and
+&quot;_id&quot; suffixed. So a <tt>Person</tt> class that makes a <a
+href="ClassMethods.html#M000062">has_one</a> association will use
+&quot;person_id&quot; as the default foreign_key.
+
+</li>
+</ul>
+<p>
+Option examples:
+</p>
+<pre>
+  has_one :credit_card, :dependent =&gt; true
+  has_one :last_comment, :class_name =&gt; &quot;Comment&quot;, :order =&gt; &quot;posted_on&quot;
+  has_one :project_manager, :class_name =&gt; &quot;Person&quot;, :conditions =&gt; &quot;role = 'project_manager'&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000062-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000062-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/associations.rb, line 202</span>
+202:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_one</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span> = {})
+203:         <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge!</span>({ <span class="ruby-identifier">:remote</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span> })
+204:         <span class="ruby-identifier">belongs_to</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span>)
+205: 
+206:         <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span> =
+207:             <span class="ruby-identifier">associate_identification</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class_name</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:foreign_key</span>])
+208: 
+209:         <span class="ruby-identifier">has_one_writer_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+210:         <span class="ruby-identifier">build_method</span>(<span class="ruby-value str">&quot;build_&quot;</span>, <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+211:         <span class="ruby-identifier">create_method</span>(<span class="ruby-value str">&quot;create_&quot;</span>, <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span>)
+212:         
+213:         <span class="ruby-identifier">module_eval</span> <span class="ruby-node">&quot;before_destroy '#{association_name}.destroy if has_#{association_name}?'&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:dependent</span>]
+214:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- belongs_to(association_id, options = {}) -->
+			<div id="method-M000063" class="method-detail">
+				<a name="M000063"></a>
+
+				<div class="method-heading">
+					<a href="#M000063" class="method-signature">
+					<span class="method-name">belongs_to</span><span class="method-args">(association_id, options = {})</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Adds the following methods for retrival and query for a single associated
+object that this object holds an id to. <tt>association</tt> is replaced
+with the symbol passed as the first argument, so <tt><a
+href="ClassMethods.html#M000063">belongs_to</a> :author</tt> would add
+among others <tt>has_author?</tt>.
+</p>
+<ul>
+<li><tt>association(force_reload = false)</tt> - returns the associated object.
+Nil is returned if none is found.
+
+</li>
+<li><tt>association=(associate)</tt> - assigns the associate object, extracts
+the primary key, and sets it as the foreign key.
+
+</li>
+<li><tt>association?(object, force_reload = false)</tt> - returns true if the
+<tt>object</tt> is of the same type and has the same id as the associated
+object.
+
+</li>
+<li><tt>has_association?(force_reload = false)</tt> - returns true if
+there&#8217;s an associated object.
+
+</li>
+</ul>
+<p>
+Example: An Post class declares <tt><a
+href="ClassMethods.html#M000062">has_one</a> :author</tt>, which will add:
+</p>
+<ul>
+<li><tt>Post#author</tt> (similar to <tt>Author.find(author_id)</tt>)
+
+</li>
+<li><tt>Post#author=(author)</tt> (similar to <tt>post.author_id =
+author.id</tt>)
+
+</li>
+<li><tt>Post#author?</tt> (similar to <tt>post.author == some_author</tt>)
+
+</li>
+<li><tt>Post#has_author?</tt> (similar to <tt>!post.author.nil?</tt>)
+
+</li>
+</ul>
+<p>
+The declaration can also include an options hash to specialize the
+generated methods.
+</p>
+<p>
+Options are:
+</p>
+<ul>
+<li><tt>:class_name</tt> - specify the class name of the association. Use it
+only if that name can&#8217;t be infered from the association name. So
+<tt><a href="ClassMethods.html#M000062">has_one</a> :author</tt> will by
+default be linked to the <tt>Author</tt> class, but if the real class name
+is <tt>Person</tt>, you&#8217;ll have to specify it with this option.
+
+</li>
+<li><tt>:conditions</tt> - specify the conditions that the associated object
+must meet in order to be included as a &quot;WHERE&quot; sql fragment, such
+as &quot;authorized = 1&quot;.
+
+</li>
+<li><tt>:order</tt> - specify the order from which the associated object will
+be picked at the top. Specified as an &quot;ORDER BY&quot; sql fragment,
+such as &quot;last_name, first_name DESC&quot;
+
+</li>
+<li><tt>:foreign_key</tt> - specify the foreign key used for the association.
+By default this is guessed to be the name of the associated class in
+lower-case and &quot;_id&quot; suffixed. So a <tt>Person</tt> class that
+makes a <a href="ClassMethods.html#M000063">belongs_to</a> association to a
+<tt>Boss</tt> class will use &quot;boss_id&quot; as the default
+foreign_key.
+
+</li>
+<li><tt>:counter_cache</tt> - caches the number of belonging objects on the
+associate class through use of increment_counter and decrement_counter. The
+counter cache is incremented when an object of this class is created and
+decremented when it&#8217;s destroyed. This requires that a column named
+&quot;#{table_name}_count&quot; (such as comments_count for a belonging
+Comment class) is used on the associate class (such as a Post class).
+
+</li>
+</ul>
+<p>
+Option examples:
+</p>
+<pre>
+  belongs_to :firm, :foreign_key =&gt; &quot;client_of&quot;
+  belongs_to :author, :class_name =&gt; &quot;Person&quot;, :foreign_key =&gt; &quot;author_id&quot;
+  belongs_to :valid_coupon, :class_name =&gt; &quot;Coupon&quot;, :foreign_key =&gt; &quot;coupon_id&quot;,
+             :conditions =&gt; 'discounts &gt; #{payments_count}'
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000063-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000063-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/associations.rb, line 253</span>
+253:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">belongs_to</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span> = {})
+254:         <span class="ruby-identifier">validate_options</span>([ <span class="ruby-identifier">:class_name</span>, <span class="ruby-identifier">:foreign_key</span>, <span class="ruby-identifier">:remote</span>, <span class="ruby-identifier">:conditions</span>, <span class="ruby-identifier">:order</span>, <span class="ruby-identifier">:dependent</span>, <span class="ruby-identifier">:counter_cache</span> ], <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>)
+255: 
+256:         <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span> =
+257:             <span class="ruby-identifier">associate_identification</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class_name</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:foreign_key</span>])
+258: 
+259:         <span class="ruby-identifier">association_class_primary_key_name</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:foreign_key</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">association_class_name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^.*::/</span>, <span class="ruby-value str">''</span>).<span class="ruby-identifier">downcase</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;_id&quot;</span>
+260: 
+261:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:remote</span>]
+262:           <span class="ruby-identifier">association_finder</span> = <span class="ruby-value str">&quot;\#{association_class_name}.find_first(\n\&quot;\#{class_primary_key_name} = '\\\#{id}'\#{options[:conditions] ? \&quot; AND \&quot; + options[:conditions] : \&quot;\&quot;}\&quot;,\n\#{options[:order] ? \&quot;\\\&quot;\&quot; + options[:order] + \&quot;\\\&quot;\&quot; : \&quot;nil\&quot; }\n)\n&quot;</span>
+263:         <span class="ruby-keyword kw">else</span>
+264:           <span class="ruby-identifier">association_finder</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:conditions</span>] <span class="ruby-operator">?</span>
+265:             <span class="ruby-node">&quot;#{association_class_name}.find_on_conditions(#{association_class_primary_key_name}, \&quot;#{options[:conditions]}\&quot;)&quot;</span> <span class="ruby-operator">:</span>
+266:             <span class="ruby-node">&quot;#{association_class_name}.find(#{association_class_primary_key_name})&quot;</span>
+267:         <span class="ruby-keyword kw">end</span>
+268: 
+269:         <span class="ruby-identifier">has_association_method</span>(<span class="ruby-identifier">association_name</span>)
+270:         <span class="ruby-identifier">association_reader_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_finder</span>)
+271:         <span class="ruby-identifier">belongs_to_writer_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_primary_key_name</span>)
+272:         <span class="ruby-identifier">association_comparison_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>)
+273: 
+274:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:counter_cache</span>]
+275:           <span class="ruby-identifier">module_eval</span>(
+276:             <span class="ruby-node">&quot;after_create '#{association_class_name}.increment_counter(\&quot;#{table_name + &quot;_count&quot;}\&quot;, #{association_class_primary_key_name})&quot;</span> <span class="ruby-operator">+</span>
+277:             <span class="ruby-node">&quot; if has_#{association_name}?'&quot;</span>
+278:           )
+279: 
+280:           <span class="ruby-identifier">module_eval</span>(
+281:             <span class="ruby-node">&quot;before_destroy '#{association_class_name}.decrement_counter(\&quot;#{table_name + &quot;_count&quot;}\&quot;, #{association_class_primary_key_name})&quot;</span> <span class="ruby-operator">+</span>
+282:             <span class="ruby-node">&quot; if has_#{association_name}?'&quot;</span>
+283:           )          
+284:         <span class="ruby-keyword kw">end</span>
+285:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- has_and_belongs_to_many(association_id, options = {}) -->
+			<div id="method-M000064" class="method-detail">
+				<a name="M000064"></a>
+
+				<div class="method-heading">
+					<a href="#M000064" class="method-signature">
+					<span class="method-name">has_and_belongs_to_many</span><span class="method-args">(association_id, options = {})</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p>
+Associates two classes via an intermediate join table. Unless the join
+table is explicitly specified as an option, it is guessed using the lexical
+order of the class names. So a join between Developer and Project will give
+the default join table name of &quot;developers_projects&quot; because
+&quot;D&quot; outranks &quot;C&quot;. Adds the following methods for
+retrival and query. <tt>collection</tt> is replaced with the symbol passed
+as the first argument, so <tt><a
+href="ClassMethods.html#M000064">has_and_belongs_to_many</a>
+:categories</tt> would add among others <tt>add_categories</tt>.
+</p>
+<ul>
+<li><tt>collection(force_reload = false)</tt> - returns an array of all the
+associated objects. An empty array is returned if none is found.
+
+</li>
+<li><tt>has_collection?(force_reload = false)</tt> - returns true if
+there&#8217;s any associated objects.
+
+</li>
+<li><tt>collection_count(force_reload = false)</tt> - returns the number of
+associated objects.
+
+</li>
+<li><tt>add_collection(object1, object2)</tt> - adds an association between
+this object and the objects given as arguments. The object arguments can
+either be given one by one or in an array.
+
+</li>
+<li><tt>remove_collection(object1, object2)</tt> - removes the association
+between this object and the objects given as arguments. The object
+arguments can either be given one by one or in an array.
+
+</li>
+</ul>
+<p>
+Example: An Developer class declares <tt><a
+href="ClassMethods.html#M000064">has_and_belongs_to_many</a>
+:projects</tt>, which will add:
+</p>
+<ul>
+<li><tt>Developer#projects</tt>
+
+</li>
+<li><tt>Developer#has_projects?</tt>
+
+</li>
+<li><tt>Developer#projects_count</tt>
+
+</li>
+<li><tt>Developer#add_projects</tt>
+
+</li>
+<li><tt>Developer#remove_projects</tt>
+
+</li>
+</ul>
+<p>
+The declaration can also include an options hash to specialize the
+generated methods.
+</p>
+<p>
+Options are:
+</p>
+<ul>
+<li><tt>:class_name</tt> - specify the class name of the association. Use it
+only if that name can&#8217;t be infered from the association name. So
+<tt><a href="ClassMethods.html#M000064">has_and_belongs_to_many</a>
+:projects</tt> will by default be linked to the <tt>Project</tt> class, but
+if the real class name is <tt>SuperProject</tt>, you&#8217;ll have to
+specify it with this option.
+
+</li>
+<li><tt>:join_table</tt> - specify the name of the join table if the default
+based on lexical order isn&#8217;t what you want
+
+</li>
+<li><tt>:foreign_key</tt> - specify the foreign key used for the association.
+By default this is guessed to be the name of this class in lower-case and
+&quot;_id&quot; suffixed. So a <tt>Person</tt> class that makes a <a
+href="ClassMethods.html#M000064">has_and_belongs_to_many</a> association
+will use &quot;person_id&quot; as the default foreign_key.
+
+</li>
+<li><tt>:association_foreign_key</tt> - specify the association foreign key
+used for the association. By default this is guessed to be the name of the
+associated class in lower-case and &quot;_id&quot; suffixed. So the
+associated class is <tt>Project</tt> that makes a <a
+href="ClassMethods.html#M000064">has_and_belongs_to_many</a> association
+will use &quot;project_id&quot; as the default association foreign_key.
+
+</li>
+<li><tt>:finder_sql</tt> - overwrite the default generated SQL used to fetch
+the association with a manual one
+
+</li>
+<li><tt>:delete_sql</tt> - overwrite the default generated SQL used to remove
+links between the associated classes with a manual one
+
+</li>
+<li><tt>:insert_sql</tt> - overwrite the default generated SQL used to add
+links between the associated classes with a manual one
+
+</li>
+</ul>
+<p>
+Option examples:
+</p>
+<pre>
+  has_and_belongs_to_many :projects
+  has_and_belongs_to_many :nations, :class_name =&gt; &quot;Country&quot;
+  has_and_belongs_to_many :categories, :join_table =&gt; &quot;prods_cats&quot;
+</pre>
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000064-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000064-source">
+<pre>
+     <span class="ruby-comment cmt"># File vendor/activerecord/lib/active_record/associations.rb, line 337</span>
+337:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_and_belongs_to_many</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span> = {})
+338:         <span class="ruby-identifier">validate_options</span>([ <span class="ruby-identifier">:class_name</span>, <span class="ruby-identifier">:table_name</span>, <span class="ruby-identifier">:foreign_key</span>, <span class="ruby-identifier">:association_foreign_key</span>,
+339:                            <span class="ruby-identifier">:join_table</span>, <span class="ruby-identifier">:finder_sql</span>, <span class="ruby-identifier">:delete_sql</span>, <span class="ruby-identifier">:insert_sql</span> ], <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>)
+340: 
+341:         <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_class_name</span>, <span class="ruby-identifier">class_primary_key_name</span> =
+342:             <span class="ruby-identifier">associate_identification</span>(<span class="ruby-identifier">association_id</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:class_name</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:foreign_key</span>])
+343: 
+344: 
+345:         <span class="ruby-identifier">association_foreign_key</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:association_foreign_key</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">association_class_name</span>.<span class="ruby-identifier">downcase</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;_id&quot;</span>
+346: 
+347:         <span class="ruby-identifier">association_table_name</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:table_name</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">table_name</span>(<span class="ruby-identifier">association_class_name</span>)
+348:         <span class="ruby-identifier">my_key</span>      = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:key</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">downcase</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;_id&quot;</span>
+349:         <span class="ruby-identifier">join_table</span>  = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:join_table</span>] <span class="ruby-operator">||</span> 
+350:           <span class="ruby-identifier">join_table_name</span>(<span class="ruby-identifier">undecorated_table_name</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">to_s</span>), <span class="ruby-identifier">undecorated_table_name</span>(<span class="ruby-identifier">association_class_name</span>))
+351: 
+352:         <span class="ruby-identifier">finder_sql</span>  = 
+353:           <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:finder_sql</span>] <span class="ruby-operator">||</span>
+354:           <span class="ruby-node">&quot;SELECT t.* FROM #{association_table_name} t, #{join_table} j &quot;</span> <span class="ruby-operator">+</span>
+355:           <span class="ruby-node">&quot;WHERE t.id = j.#{association_foreign_key} AND j.#{class_primary_key_name} = '\#{id}' ORDER BY t.id&quot;</span>
+356: 
+357:         <span class="ruby-identifier">has_collection_method</span>(<span class="ruby-identifier">association_name</span>)
+358:         <span class="ruby-identifier">collection_reader_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-node">&quot;#{association_class_name}.find_by_sql(\&quot;#{finder_sql}\&quot;)&quot;</span>)
+359:         <span class="ruby-identifier">collection_count_method</span>(<span class="ruby-identifier">association_name</span>, <span class="ruby-node">&quot;#{association_name}.length&quot;</span>)
+360: 
+361:         <span class="ruby-identifier">add_association_relation</span>(
+362:           <span class="ruby-identifier">association_name</span>, 
+363:           <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:insert_sql</span>] <span class="ruby-operator">||</span> 
+364:             <span class="ruby-node">&quot;INSERT INTO #{join_table} (#{class_primary_key_name}, #{association_foreign_key}) &quot;</span> <span class="ruby-operator">+</span>
+365:             <span class="ruby-value str">&quot;VALUES ('\#{id}', '\#{item.id}')&quot;</span>
+366:         )
+367: 
+368:         <span class="ruby-identifier">remove_association_relation</span>(
+369:           <span class="ruby-identifier">association_name</span>, <span class="ruby-identifier">association_foreign_key</span>, 
+370:           <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:delete_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-node">&quot;DELETE FROM #{join_table} WHERE #{class_primary_key_name} = '\#{id}'&quot;</span>
+371:         )
+372:       <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
