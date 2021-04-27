@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 require File.dirname(__FILE__) + '/../vendor/railties/load_path'
 require 'dispatcher'

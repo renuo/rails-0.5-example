@@ -1,5 +1,5 @@
-#!/usr/local/bin/ruby -w
-                                                                                
+#!/usr/bin/env ruby -w
+
 # This is a session storage daemon which can be shared by multiple FCGI
 # processes. It's just a hash which is enabled for DRb access.
                                                                                 

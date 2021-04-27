@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 def create_controller_class(controller_name, show_actions)
   File.open("app/controllers/" + controller_name.downcase  + "_controller.rb", "w", 0777) do |controller_file|

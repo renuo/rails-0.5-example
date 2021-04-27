@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 def create_model_class(model_name)
   File.open("app/models/" + model_name.downcase  + ".rb", "w", 0777) do |model_file|
