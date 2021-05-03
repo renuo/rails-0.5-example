@@ -31,7 +31,7 @@ module ActionController
         rewritten_url = ""
         rewritten_url << @protocol
         rewritten_url << @host
-        rewritten_url << ":#{@port}" unless @port == 80
+        rewritten_url << ":#{@port}" unless @port == 80 || @host.include?(':')
         rewritten_url << path
         rewritten_url << build_query_string(options[:params]) if options[:params]
         return rewritten_url
