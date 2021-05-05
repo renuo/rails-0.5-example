@@ -3,7 +3,6 @@ require 'coin'
 
 class CoinTest < Test::Unit::TestCase
   def setup
-    @coins = create_fixtures "coins"
   end
 
   def test_something

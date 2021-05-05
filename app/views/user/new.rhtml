@@ -1,0 +1,13 @@
+<h1>Join JoyCoin</h1>
+
+<form action="create" method="post">
+  <label for="user_name">Name:</label>
+  <%= text_field "user", "name", "size" => 20, "placeholder" => "Josua" %>
+  <%= @user.errors.on('name') %>
+
+  <label for="user_email">Email:</label>
+  <%= text_field "user", "email", "size" => 20, "placeholder" => "josua@example.com" %>
+  <%= @user.errors.on('email') %>
+
+  <input type="submit" value="Register">
+</form>
