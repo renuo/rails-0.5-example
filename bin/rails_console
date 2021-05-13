@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ruby -r irb -r "vendor/railties/load_path" -r "logger" -r "yaml" -r "active_record" -e "ActiveRecord::Base.establish_connection(YAML::load(File.open('config/database.yml'))['production']); IRB.start"
