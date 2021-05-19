@@ -1,8 +1,17 @@
 require "action_controller"
 require "user"
 
+def helper_method(method)
+  template_class.class_eval %Q(
+    def #{method}(*args, &block)
+      controller.send(:'#{method}', *args, &block)
+    end
+  )
+end
+
 class ApplicationController < ActionController::Base
   layout "layouts/application"
+  helper_method :current_user
 
   private
 
@@ -12,7 +21,9 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    User.find_first(["id = %d", @session["user_id"]]) if @session["user_id"]
+    if @session["user_id"]
+      @_current_user ||= User.find_first(["id = %d", @session["user_id"]])
+    end
   end
 
   def authorize_user!

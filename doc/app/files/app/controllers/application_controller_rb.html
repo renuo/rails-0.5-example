@@ -56,7 +56,7 @@
 		</tr>
 		<tr class="top-aligned-row">
 			<td><strong>Last Update:</strong></td>
-			<td>Mon May 17 22:15:20 CEST 2021</td>
+			<td>Thu May 20 00:22:16 CEST 2021</td>
 		</tr>
 		</table>
 	</div>
@@ -77,6 +77,13 @@
 			</div>
 		</div>
 
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000001">helper_method</a>&nbsp;&nbsp;
+			</div>
+		</div>
 
 
 
@@ -97,6 +104,38 @@
 
 
 		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<div id="method-M000001" class="method-detail">
+				<a name="M000001"></a>
+
+				<div class="method-heading">
+					<a href="#M000001" class="method-signature">
+					<span class="method-name">helper_method</span><span class="method-args">(method)</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000001-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/controllers/application_controller.rb, line 4</span>
+ 4: <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">helper_method</span>(<span class="ruby-identifier">method</span>)
+ 5:   <span class="ruby-identifier">template_class</span>.<span class="ruby-identifier">class_eval</span> <span class="ruby-node">%(
+ 6:     def #{method}(*args, &amp;block)
+ 7:       controller.send(:'#{method}', *args, &amp;block)
+ 8:     end
+ 9:   )</span>
+10: <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
 
 
 	</div>

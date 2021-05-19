@@ -1,8 +1,5 @@
 <h1>Coin#new</h1>
 
-<pre><%= @receiver.errors.inspect %></pre>
-<pre><%= @coin.errors.inspect %></pre>
-
 <form action="create" method="post">
   <label for="receiver">Receiver:</label>
   <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
