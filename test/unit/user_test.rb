@@ -15,10 +15,13 @@ class UserTest < Test::Unit::TestCase
   end
 
   def test_email_uniqueness_validation
-    User.create('email' => 'josua@renuo.ch', 'name' => 'Josua')
+    original_user = User.create('email' => 'josua@renuo.ch', 'name' => 'Josua')
     duplicate_user = User.new('email' => 'josua@renuo.ch', 'name' => 'Josua')
     assert !duplicate_user.valid?
     assert duplicate_user.errors.on('email').to_s.include?('taken')
+
+    # Regressions: the original user should not be a duplicate of himself
+    assert original_user.valid?
   end
 
   def test_email_format_validation

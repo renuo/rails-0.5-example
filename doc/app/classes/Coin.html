@@ -76,6 +76,13 @@
 
 
 
+		<div id="method-list">
+			<h2 class="section-bar">Methods</h2>
+
+			<div class="name-list">
+			<a href="#M000008">validate</a>&nbsp;&nbsp;
+			</div>
+		</div>
 
 
 
@@ -90,6 +97,35 @@
 
 
 		<!-- if method_list -->
+		<div id="methods">
+			<h2 class="section-bar">Public Instance methods</h2>
+
+			<div id="method-M000008" class="method-detail">
+				<a name="M000008"></a>
+
+				<div class="method-heading">
+					<a href="#M000008" class="method-signature">
+					<span class="method-name">validate</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000008-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000008-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/coin.rb, line 8</span>
+ 8:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">validate</span>
+ 9:     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add_on_empty</span> <span class="ruby-node">%(sender_id receiver_id message)</span>
+10:     <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value str">&quot;receiver_id&quot;</span>, <span class="ruby-value str">&quot;is sender&quot;</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">receiver_id</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">sender_id</span>
+11:   <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
 
 
 	</div>

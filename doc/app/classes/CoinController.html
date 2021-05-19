@@ -125,13 +125,19 @@
 					  onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
 					<div class="method-source-code" id="M000007-source">
 <pre>
-    <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 18</span>
-18:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>
-19:     <span class="ruby-identifier">receiver</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">find_first</span>([<span class="ruby-value str">&quot;email = '%s'&quot;</span>, <span class="ruby-ivar">@params</span>[<span class="ruby-value str">'receiver_email'</span>]])
-20:     <span class="ruby-identifier">receiver</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'email'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@params</span>[<span class="ruby-value str">'receiver_email'</span>]) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">receiver</span>
-21: 
-22:     <span class="ruby-constant">Coin</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value str">'receiver'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">receiver</span>, <span class="ruby-value str">'sender'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current_user</span>, <span class="ruby-value str">'message'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@params</span>[<span class="ruby-value str">'message'</span>])
-23:   <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 19</span>
+19:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>
+20:     <span class="ruby-ivar">@receiver</span> = <span class="ruby-identifier">find_or_create_by</span>(<span class="ruby-identifier">receiver_params</span>[<span class="ruby-value str">&quot;email&quot;</span>])
+21:     <span class="ruby-ivar">@coin</span> = <span class="ruby-constant">Coin</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">coin_params</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value str">&quot;sender&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current_user</span>, <span class="ruby-value str">&quot;receiver&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@receiver</span>))
+22: 
+23:     <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@receiver</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@coin</span>.<span class="ruby-identifier">save</span>
+24:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Coin sent&quot;</span>
+25:       <span class="ruby-identifier">render_action</span> <span class="ruby-identifier">:create</span>
+26:     <span class="ruby-keyword kw">else</span>
+27:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Validation failed&quot;</span>
+28:       <span class="ruby-identifier">render_action</span> <span class="ruby-identifier">:mine</span>
+29:     <span class="ruby-keyword kw">end</span>
+30:   <span class="ruby-keyword kw">end</span>
 </pre>
 					</div>
 				</div>
@@ -177,7 +183,8 @@
     <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 14</span>
 14:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">mine</span>
 15:     <span class="ruby-ivar">@coin</span> = <span class="ruby-constant">Coin</span>.<span class="ruby-identifier">new</span>
-16:   <span class="ruby-keyword kw">end</span>
+16:     <span class="ruby-ivar">@receiver</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">new</span>
+17:   <span class="ruby-keyword kw">end</span>
 </pre>
 					</div>
 				</div>

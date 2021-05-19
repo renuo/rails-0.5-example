@@ -1,6 +1,16 @@
 <h1>Coin#new</h1>
-<form>
+
+<pre><%= @receiver.errors.inspect %></pre>
+<pre><%= @coin.errors.inspect %></pre>
+
+<form action="create" method="post">
   <label for="receiver">Receiver:</label>
-  <input name="receiver" type="email" required="required"/>
-  <input type="submit"/>
+  <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
+  <%= @coin.errors.on('receiver') %>
+
+  <label for="message">Message:</label>
+  <%= text_area "coin", "message", "cols" => 40, "rows" => 10, "placeholder" => "Nice job!" %>
+  <%= @coin.errors.on('message') %>
+
+  <input type="submit" value="Send">
 </form>

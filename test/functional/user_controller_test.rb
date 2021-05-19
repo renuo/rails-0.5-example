@@ -30,13 +30,13 @@ class UserControllerTest < Test::Unit::TestCase
   def test_login_success
     user = User.create('email' => 'login@renuo.ch', 'name' => 'Loginer')
     @request.action = "login"
-    @request.request_parameters['login_token'] = user.login_token
+    @request.query_parameters['otp'] = user.login_token
     assert_equal user.id, UserController.process_test(@request).session["user_id"]
   end
 
   def test_login_failure
     @request.action = "login"
-    @request.request_parameters['login_token'] = 'blub'
+    @request.query_parameters['otp'] = 'blub'
     assert_nil UserController.process_test(@request).session["user_id"]
   end
 
