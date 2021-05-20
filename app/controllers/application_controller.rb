@@ -1,17 +1,14 @@
 require "action_controller"
 require "user"
 
-def helper_method(method)
-  template_class.class_eval %Q(
-    def #{method}(*args, &block)
-      controller.send(:'#{method}', *args, &block)
-    end
-  )
-end
-
 class ApplicationController < ActionController::Base
   layout "layouts/application"
-  helper_method :current_user
+
+  template_class.class_eval do
+    def current_user
+      controller.send(:current_user)
+    end
+  end
 
   private
 
