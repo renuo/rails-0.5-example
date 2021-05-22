@@ -4,6 +4,7 @@ require "user"
 class ApplicationController < ActionController::Base
   layout "layouts/application"
 
+  # Make controller helpers available to view templates
   template_class.class_eval do
     def current_user
       controller.send(:current_user)
@@ -19,23 +20,24 @@ class ApplicationController < ActionController::Base
 
   def current_user
     if @session["user_id"]
-      @_current_user ||= User.find_first(["id = %d", @session["user_id"]])
+      User.find_first(["id = %d", @session["user_id"]]) # TODO: caching?
     end
   end
 
   def authorize_user!
-    return true if current_user
+    return true if current_user || login_by_otp # We bypass the login page if an OTP is presented
 
+    flash["notice"] = "Login required"
+    redirect_to(:controller => "user", :action => "start") and false
+  end
+
+  def login_by_otp
     if params["otp"] && params["otp"].length == 40
       user = User.find_first(["login_token = '%s'", params["otp"]])
       if user
         @session["user_id"] = user.id
-        user.update_attribute("login_token", User.generate_login_token)
         return true
       end
     end
-
-    flash["notice"] = "Login required"
-    redirect_to(:controller => "user", :action => "new", :path_params => {}) and false
   end
 end

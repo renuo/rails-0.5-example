@@ -82,9 +82,9 @@
 			<h2 class="section-bar">Methods</h2>
 
 			<div class="name-list">
-			<a href="#M000007">create</a>&nbsp;&nbsp;
-			<a href="#M000005">list</a>&nbsp;&nbsp;
-			<a href="#M000006">mine</a>&nbsp;&nbsp;
+			<a href="#M000009">create</a>&nbsp;&nbsp;
+			<a href="#M000007">list</a>&nbsp;&nbsp;
+			<a href="#M000008">mine</a>&nbsp;&nbsp;
 			</div>
 		</div>
 
@@ -111,12 +111,49 @@
 		<div id="methods">
 			<h2 class="section-bar">Public Instance methods</h2>
 
+			<div id="method-M000009" class="method-detail">
+				<a name="M000009"></a>
+
+				<div class="method-heading">
+					<a href="#M000009" class="method-signature">
+					<span class="method-name">create</span><span class="method-args">()</span>
+					</a>
+				</div>
+			
+				<div class="method-description">
+					<p><a class="source-toggle" href="#"
+					  onclick="toggleCode('M000009-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000009-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 19</span>
+19:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>
+20:     <span class="ruby-identifier">sender</span> = <span class="ruby-identifier">current_user</span>
+21:     <span class="ruby-ivar">@receiver</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-identifier">receiver_params</span>[<span class="ruby-value str">&quot;email&quot;</span>])
+22:     <span class="ruby-ivar">@coin</span> = <span class="ruby-constant">Coin</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">coin_params</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value str">&quot;sender&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">sender</span>, <span class="ruby-value str">&quot;receiver&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@receiver</span>))
+23: 
+24:     <span class="ruby-comment cmt"># Antecedent deduction (prepaid race conditions for hacker)</span>
+25:     <span class="ruby-constant">User</span>.<span class="ruby-identifier">update_all</span>(<span class="ruby-value str">'budget = budget - 1'</span>, [<span class="ruby-value str">'id = %d'</span>, <span class="ruby-identifier">sender</span>.<span class="ruby-identifier">id</span>])
+26: 
+27:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">sender</span>.<span class="ruby-identifier">budget</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@receiver</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@coin</span>.<span class="ruby-identifier">save</span>
+28:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Coin sent&quot;</span>
+29:       <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">:controller</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'coin'</span>, <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;mine&quot;</span>
+30:     <span class="ruby-keyword kw">else</span>
+31:       <span class="ruby-constant">User</span>.<span class="ruby-identifier">update_all</span>(<span class="ruby-value str">'budget = budget + 1'</span>, [<span class="ruby-value str">'id = %d'</span>, <span class="ruby-identifier">sender</span>.<span class="ruby-identifier">id</span>])
+32:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Validation failed&quot;</span>
+33:       <span class="ruby-identifier">render_action</span> <span class="ruby-identifier">:mine</span>
+34:     <span class="ruby-keyword kw">end</span>
+35:   <span class="ruby-keyword kw">end</span>
+</pre>
+					</div>
+				</div>
+			</div>
+
 			<div id="method-M000007" class="method-detail">
 				<a name="M000007"></a>
 
 				<div class="method-heading">
 					<a href="#M000007" class="method-signature">
-					<span class="method-name">create</span><span class="method-args">()</span>
+					<span class="method-name">list</span><span class="method-args">()</span>
 					</a>
 				</div>
 			
@@ -124,38 +161,6 @@
 					<p><a class="source-toggle" href="#"
 					  onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
 					<div class="method-source-code" id="M000007-source">
-<pre>
-    <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 19</span>
-19:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create</span>
-20:     <span class="ruby-ivar">@receiver</span> = <span class="ruby-identifier">find_or_create_by</span>(<span class="ruby-identifier">receiver_params</span>[<span class="ruby-value str">&quot;email&quot;</span>])
-21:     <span class="ruby-ivar">@coin</span> = <span class="ruby-constant">Coin</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">coin_params</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value str">&quot;sender&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current_user</span>, <span class="ruby-value str">&quot;receiver&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@receiver</span>))
-22: 
-23:     <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@receiver</span>.<span class="ruby-identifier">valid?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@coin</span>.<span class="ruby-identifier">save</span>
-24:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Coin sent&quot;</span>
-25:       <span class="ruby-identifier">render_action</span> <span class="ruby-identifier">:create</span>
-26:     <span class="ruby-keyword kw">else</span>
-27:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Validation failed&quot;</span>
-28:       <span class="ruby-identifier">render_action</span> <span class="ruby-identifier">:mine</span>
-29:     <span class="ruby-keyword kw">end</span>
-30:   <span class="ruby-keyword kw">end</span>
-</pre>
-					</div>
-				</div>
-			</div>
-
-			<div id="method-M000005" class="method-detail">
-				<a name="M000005"></a>
-
-				<div class="method-heading">
-					<a href="#M000005" class="method-signature">
-					<span class="method-name">list</span><span class="method-args">()</span>
-					</a>
-				</div>
-			
-				<div class="method-description">
-					<p><a class="source-toggle" href="#"
-					  onclick="toggleCode('M000005-source');return false;">[Source]</a></p>
-					<div class="method-source-code" id="M000005-source">
 <pre>
     <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 10</span>
 10:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">list</span>
@@ -166,19 +171,19 @@
 				</div>
 			</div>
 
-			<div id="method-M000006" class="method-detail">
-				<a name="M000006"></a>
+			<div id="method-M000008" class="method-detail">
+				<a name="M000008"></a>
 
 				<div class="method-heading">
-					<a href="#M000006" class="method-signature">
+					<a href="#M000008" class="method-signature">
 					<span class="method-name">mine</span><span class="method-args">()</span>
 					</a>
 				</div>
 			
 				<div class="method-description">
 					<p><a class="source-toggle" href="#"
-					  onclick="toggleCode('M000006-source');return false;">[Source]</a></p>
-					<div class="method-source-code" id="M000006-source">
+					  onclick="toggleCode('M000008-source');return false;">[Source]</a></p>
+					<div class="method-source-code" id="M000008-source">
 <pre>
     <span class="ruby-comment cmt"># File app/controllers/coin_controller.rb, line 14</span>
 14:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">mine</span>

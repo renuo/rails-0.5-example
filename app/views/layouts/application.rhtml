@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
 
-  <title>Unique page title - My Site</title>
+  <title>&#x1F44D;coin</title>
 
   <script type="module">
     document.documentElement.classList.remove('no-js');
@@ -33,6 +33,14 @@
 </head>
 
 <body>
+  <% if current_user %>
+  <ul>
+    <li><%= link_to 'Give', :controller => 'coin', :action => 'mine' %></li>
+    <li><%= link_to 'List', :controller => 'coin', :action => 'list' %></li>
+    <li><%= link_to 'Logout', :controller => 'user', :action => 'logout' %></li>
+  </ul>
+  <% end %>
+
   <%= @flash["notice"] %>
 
   <%= @content_for_layout %>

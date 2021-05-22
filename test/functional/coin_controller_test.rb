@@ -23,13 +23,21 @@ class CoinControllerTest < Test::Unit::TestCase
     @request.action = "create"
     @request.request_parameters['receiver'] = { 'email' => @josuette.email}
     @request.request_parameters['coin'] = { 'message' => 'Lol, nice!'}
-    assert_equal "coin/create", CoinController.process_test(@request).template.first_render
+
+    assert_equal User::DEFAULT_BUDGET, @josua.budget
+    headers = CoinController.process_test(@request).headers
+    assert headers['Status'][/^302/] # redirect
+    assert headers['location'][/coin\/mine/]
+    assert_equal User::DEFAULT_BUDGET - 1, reload(@josua).budget
   end
 
   def test_create_failure
     @request.action = "create"
     @request.request_parameters['receiver'] = { 'email' => @josua.email} # Receiver is sender
     @request.request_parameters['coin'] = { 'message' => 'Lol, nice!'}
+
+    assert_equal User::DEFAULT_BUDGET, @josua.budget
     assert_equal "coin/mine", CoinController.process_test(@request).template.first_render
+    assert_equal User::DEFAULT_BUDGET, reload(@josua).budget
   end
 end

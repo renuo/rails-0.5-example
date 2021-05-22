@@ -20,3 +20,7 @@ ActiveRecord::Base.establish_connection(db_conf["test"])
 def create_fixtures(table_name)
   Fixtures.new(ActiveRecord::Base.connection, table_name, File.dirname(__FILE__) + "/fixtures/#{table_name}")
 end
+
+def reload(model)
+  model.class.find(model.id)
+end

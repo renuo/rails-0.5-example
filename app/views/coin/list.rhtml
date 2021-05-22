@@ -1,8 +1,9 @@
-<h1><%= @coins.length %> Gifcoins!</h1>
+<h1><%= @coins.length %> &#x1F44D;coins mined!</h1>
+
 <ul>
   <% @coins.each do |coin| %>
     <li>
-      <strong><%= coin.sender.name %> &rarr; <%= coin.receiver.name %></strong>
+      <strong><%= coin.sender.name %> &rarr; <%= coin.receiver.name || coin.receiver.email[0..0].upcase %></strong>
       <p><%= coin.message %></p>
     </li>
   <% end %>

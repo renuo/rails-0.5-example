@@ -1,4 +1,4 @@
 <h1>Your session has been cleared!</h1>
 
 <p>Let me prove it to you:</p>
-<pre><%= CGI::escapeHTML(@request.session.instance_variable_get("@data").inspect.gsub(/,/, ",\n")) %></pre>
+<pre><%= CGI::escapeHTML(@response.session.instance_variable_get("@data").inspect.gsub(/,/, ",\n")) %></pre>

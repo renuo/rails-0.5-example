@@ -17,13 +17,18 @@ class CoinController < ApplicationController
   end
 
   def create
-    @receiver = find_or_create_by(receiver_params["email"])
-    @coin = Coin.new(coin_params.merge("sender" => current_user, "receiver" => @receiver))
+    sender = current_user
+    @receiver = User.find_or_create(receiver_params["email"])
+    @coin = Coin.new(coin_params.merge("sender" => sender, "receiver" => @receiver))
 
-    if @receiver.valid? && @coin.save
+    # Antecedent deduction (prepaid race conditions for hacker)
+    User.update_all('budget = budget - 1', ['id = %d', sender.id])
+
+    if sender.budget >= 0 && @receiver.valid? && @coin.save
       flash["notice"] = "Coin sent"
-      render_action :create
+      redirect_to :controller => 'coin', :action => "mine"
     else
+      User.update_all('budget = budget + 1', ['id = %d', sender.id])
       flash["notice"] = "Validation failed"
       render_action :mine
     end
@@ -37,9 +42,5 @@ class CoinController < ApplicationController
 
   def coin_params
     extract_params params["coin"], ["message"]
-  end
-
-  def find_or_create_by(email)
-    User.find_first(["email = '%s'", email]) || User.create("email" => email)
   end
 end

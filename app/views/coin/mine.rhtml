@@ -1,13 +1,25 @@
-<h1>Coin#new</h1>
+<h1>Show appreciation with &#x1F44D;coin</h1>
 
-<form action="create" method="post">
-  <label for="receiver">Receiver:</label>
-  <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
-  <%= @coin.errors.on('receiver') %>
+<% if current_user.budget > 0 %>
 
-  <label for="message">Message:</label>
-  <%= text_area "coin", "message", "cols" => 40, "rows" => 10, "placeholder" => "Nice job!" %>
-  <%= @coin.errors.on('message') %>
+  <p>You can send <strong><%= current_user.budget %></strong> coins.
+    Each month your balance with be reset to <%= User::DEFAULT_BUDGET %>.</p>
 
-  <input type="submit" value="Send">
-</form>
+  <form action="create" method="post">
+    <label for="receiver">Receiver:</label>
+    <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
+    <%= @coin.errors.on('receiver') %>
+
+    <label for="message">Message:</label>
+    <%= text_area "coin", "message", "cols" => 40, "rows" => 10, "placeholder" => "Nice job!" %>
+    <%= @coin.errors.on('message') %>
+
+    <input type="submit" value="Send">
+  </form>
+
+<% else %>
+
+  <p>You've got no coins left to give away this month.
+    Your balance will be reset to <%= User::DEFAULT_BUDGET %> next month.</p>
+
+<% end %>

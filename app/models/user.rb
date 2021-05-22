@@ -3,6 +3,8 @@ require "active_record"
 require "coin"
 
 class User < ActiveRecord::Base
+  DEFAULT_BUDGET = 10
+
   has_many :given_coins, :class_name => "Coin", :foreign_key => "sender_id"
   has_many :received_coins, :class_name => "Coin", :foreign_key => "receiver_id"
 
@@ -22,10 +24,18 @@ class User < ActiveRecord::Base
 
   def setup_defaults
     self.login_token = User.generate_login_token
-    self.budget = 10
+    self.budget = DEFAULT_BUDGET
   end
 
   def self.generate_login_token
     OpenSSL::Random.random_bytes(20).unpack("H*").join
+  end
+
+  def self.reset_budgets
+    update_all("budget = #{DEFAULT_BUDGET}")
+  end
+
+  def self.find_or_create(email)
+    find_first(["email = '%s'", email]) || create("email" => email)
   end
 end

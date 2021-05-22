@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require File.dirname(__FILE__) + '/../vendor/railties/load_path'
+require 'active_record'
+
+db_conf = YAML::load(File.open(File.dirname(__FILE__) + "/../config/database.yml"))
+ActiveRecord::Base.establish_connection(db_conf["production"])
+
+require 'user'
+
+puts "Resetting budgets"
+puts "  Budgets before: #{User.connection.select_one('SELECT SUM(budget) FROM users').values.first}"
+User.reset_budgets.inspect
+puts "  Budgets after:  #{User.connection.select_one('SELECT SUM(budget) FROM users').values.first}"
