@@ -1,11 +1,11 @@
-<h1>&#x1F44D;coin</h1>
-
 <p>Prepare to give appreciation to other people!</p>
 
 <form action="find_or_create" method="post">
-  <label for="user_email">Email:</label>
-  <%= text_field "user", "email", "size" => 20, "placeholder" => "josua@example.com" %>
-  <%= @user.errors.on('email') %>
+  <fieldset>
+    <label for="user_email">Email:</label>
+    <%= text_field "user", "email", "size" => 20, "placeholder" => "josua@example.com" %>
+    <%= @user.errors.on('email') %>
 
-  <input type="submit" value="Start">
+    <button type="submit">Start</button>
+  </fieldset>
 </form>

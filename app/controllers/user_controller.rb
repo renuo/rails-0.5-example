@@ -18,7 +18,7 @@ class UserController < ApplicationController
 
   def login
     if login_by_otp
-      flash["notice"] = "Succesfully logged in"
+      flash["notice"] = "Successfully logged in"
       if current_user.name
         redirect_to :controller => "coin", :action => "mine"
       else
@@ -48,7 +48,7 @@ class UserController < ApplicationController
 
     if user_params['name'] && user_params['name'].length > 0
       @user.update_attribute('name', user_params['name'])
-      flash["notice"] = "What a nice name!"
+      flash["notice"] = "What a nice name this is, #{user_params['name']}!"
       redirect_to :controller => "coin", :action => "mine"
     else
       flash["notice"] = "Life is not a pony yard"

@@ -1,11 +1,11 @@
-<h1>&#x1F44D;coin</h1>
-
-<p>How do people call you?</p>
+<h2>How do people call you?</h2>
 
 <form action="update" method="post">
-  <label for="user_name">Name:</label>
-  <%= text_field "user", "name", "size" => 20, "placeholder" => "Your Name" %>
-  <%= @user.errors.on('name') %>
+  <fieldset>
+    <label for="user_name">Name:</label>
+    <%= text_field "user", "name", "size" => 20, "placeholder" => "Your Name" %>
+    <%= @user.errors.on('name') %>
 
-  <input type="submit" value="Save">
+    <button type="submit">Save</button>
+  </fieldset>
 </form>

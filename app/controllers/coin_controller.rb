@@ -25,7 +25,7 @@ class CoinController < ApplicationController
     User.update_all('budget = budget - 1', ['id = %d', sender.id])
 
     if sender.budget >= 0 && @receiver.valid? && @coin.save
-      flash["notice"] = "Coin sent"
+      flash["notice"] = "A gifcoin was sent to #{@receiver.name || @receiver.email}"
       redirect_to :controller => 'coin', :action => "mine"
     else
       User.update_all('budget = budget + 1', ['id = %d', sender.id])

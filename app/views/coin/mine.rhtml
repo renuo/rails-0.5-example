@@ -1,20 +1,23 @@
-<h1>Show appreciation with &#x1F44D;coin</h1>
+<h2>Show appreciation with a gifcoin</h2>
 
 <% if current_user.budget > 0 %>
 
-  <p>You can send <strong><%= current_user.budget %></strong> coins.
+  <p>You can send <strong><%= current_user.budget %></strong> coins now.
     Each month your balance with be reset to <%= User::DEFAULT_BUDGET %>.</p>
 
   <form action="create" method="post">
-    <label for="receiver">Receiver:</label>
-    <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
-    <%= @coin.errors.on('receiver') %>
+    <fieldset>
+      <label for="receiver">Receiver:</label>
+      <%= text_field "receiver", "email", "size" => 20, "placeholder" => "dhh@example.com" %>
+      <%= @coin.errors.on('receiver') %>
 
-    <label for="message">Message:</label>
-    <%= text_area "coin", "message", "cols" => 40, "rows" => 10, "placeholder" => "Nice job!" %>
-    <%= @coin.errors.on('message') %>
+      <label for="message">Message:</label>
+      <%= text_area "coin", "message", "cols" => 40, "rows" => 5, "placeholder" => "Nice job!" %>
+      <%= @coin.errors.on('message') %>
 
-    <input type="submit" value="Send">
+      <br>
+      <button type="submit">Send one</button>
+    </fieldset>
   </form>
 
 <% else %>
