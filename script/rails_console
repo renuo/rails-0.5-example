@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require File.dirname(__FILE__) + '/../vendor/railties/load_path'
+require 'irb'
+require 'logger'
+require 'yaml'
+require 'active_record'
+
+ActiveRecord::Base.establish_connection(YAML::load(File.open('config/database.yml'))['production'])
+IRB.start
