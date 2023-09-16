@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker container rm rails05
+docker build --cache-from=rails05 -t rails05 .
