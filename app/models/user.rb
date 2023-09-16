@@ -1,4 +1,4 @@
-require "openssl"
+#require "openssl"
 require "active_record"
 require "coin"
 
@@ -28,7 +28,8 @@ class User < ActiveRecord::Base
   end
 
   def self.generate_login_token
-    OpenSSL::Random.random_bytes(20).unpack("H*").join
+    #OpenSSL::Random.random_bytes(20).unpack("H*").join # Would need compiled OpenSSL (0.9.8 for Ruby 1.8.1)
+    `openssl rand -hex 20`.strip
   end
 
   def self.reset_budgets
