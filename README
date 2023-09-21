@@ -1,3 +1,14 @@
+Find the presentation slides here:
+https://docs.google.com/presentation/d/1gLOVBYliWIQoFG3W8weyQJtTZ7pdNmHJd-rNQ1YEYoU/edit#slide=id.g2f0470d824_1_0
+
+Run with docker:
+
+```sh
+bin/setup
+bin/run
+bin/enter
+```
+
 == Welcome to Rails
 
 Rails is a web-application and persistance framework that includes everything
