@@ -30,12 +30,12 @@ class ApplicationControllerTest < Test::Unit::TestCase
     end
   end
   def test_current_user_fail
-    User.create('email' => 'josua@hey.com', 'name' => 'josua')
+    User.create('email' => 'josua+fail@hey.com', 'name' => 'josua')
     @request.session['user_id'] = nil
     assert_nil TestCurrentUserController.process_test(@request).template.assigns['user']
   end
   def test_current_user_success
-    user = User.create('email' => 'josua@hey.com', 'name' => 'josua').id
+    user = User.create('email' => 'josua+success@hey.com', 'name' => 'josua')
     @request.session['user_id'] = user.id
     assert_equal user, TestCurrentUserController.process_test(@request).template.assigns['user']
   end
