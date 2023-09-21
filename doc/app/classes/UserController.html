@@ -177,7 +177,7 @@
     <span class="ruby-comment cmt"># File app/controllers/user_controller.rb, line 19</span>
 19:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">login</span>
 20:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">login_by_otp</span>
-21:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Succesfully logged in&quot;</span>
+21:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Successfully logged in&quot;</span>
 22:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">name</span>
 23:         <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">:controller</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;coin&quot;</span>, <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;mine&quot;</span>
 24:       <span class="ruby-keyword kw">else</span>
@@ -263,7 +263,7 @@
 48: 
 49:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">user_params</span>[<span class="ruby-value str">'name'</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">user_params</span>[<span class="ruby-value str">'name'</span>].<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
 50:       <span class="ruby-ivar">@user</span>.<span class="ruby-identifier">update_attribute</span>(<span class="ruby-value str">'name'</span>, <span class="ruby-identifier">user_params</span>[<span class="ruby-value str">'name'</span>])
-51:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;What a nice name!&quot;</span>
+51:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-node">&quot;What a nice name this is, #{user_params['name']}!&quot;</span>
 52:       <span class="ruby-identifier">redirect_to</span> <span class="ruby-identifier">:controller</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;coin&quot;</span>, <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;mine&quot;</span>
 53:     <span class="ruby-keyword kw">else</span>
 54:       <span class="ruby-identifier">flash</span>[<span class="ruby-value str">&quot;notice&quot;</span>] = <span class="ruby-value str">&quot;Life is not a pony yard&quot;</span>
