@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+
+DOC_TEMPLATE = <<-WEBPAGE
+      <?xml version="1.0" encoding="utf-8"?>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <title>RubyGems Documentation Index</title>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        </head>
+        <body>
+          <center>
+          <h1>RubyGems Documentation Index</h1>
+          <table border="2">
+            <tr>
+              <td align='center'><h3>Gem Name</h3></td>
+              <td align='center'><h3>Description</h3></td>
+              <td align='center'><h3>Documentation</h3></td>
+            </tr>
+START:specs
+            <tr><td>%full_name%</td>
+              <td>%summary%</td>
+              <td>
+IF:rdoc_installed
+                <a href="%doc_path%">RDoc Index</a>
+ENDIF:rdoc_installed
+IFNOT:rdoc_installed
+                None installed
+ENDIF:rdoc_installed
+              </td>
+            </tr>
+END:specs
+          </table>
+          </center>
+        </body>
+      </html>
+    WEBPAGE
+
+
+##
+# gem_server and gem_server.cgi are equivalent programs that allow  
+# users to serve gems for consumption by `gem --remote-install`.
+# 
+# gem_server starts an HTTP server on the given port, and serves the folowing:
+# * "/" - Browsing of gem spec files for installed gems
+# * "/yaml" - Full yaml dump of metadata for installed gems
+# * "/gems" - Direct access to download the installable gems
+#
+# Usage: gem_server [-p portnum] [-d gem_path]
+# port_num:: The TCP port the HTTP server will bind to
+# gem_path:: Root gem directory containing both "cache" and "specifications"
+#   subdirectories.
+if __FILE__ == $0
+  require 'rubygems'
+  Gem.manage_gems
+  require 'webrick'
+  require 'yaml'
+  require 'optparse'
+  require 'rdoc/template'
+  Socket.do_not_reverse_lookup=true
+  options = {}
+  ARGV.options do |opts|
+    opts.on_tail("--help", 
+      "show this message") {puts opts; exit}
+    opts.on('-pPORT','--port=PORT', 
+      "Specify the port to listen on") { |options[:port]| }
+    opts.on('-dGEMDIR','--dir=GEMDIR', 
+      "Specify the directory from which to serve Gems") { |options[:gemdir]| }
+    opts.parse!
+  end
+
+  s = WEBrick::HTTPServer.new(:Port => options[:port] || 8808)
+  s.mount_proc("/yaml") { |req, res|
+    res['content-type'] = 'text/plain'
+    res.body << Gem::Cache.from_installed_gems(File.join(options[:gemdir] || Gem.dir, "specifications")).to_yaml
+  }
+
+  s.mount_proc("/") { |req, res|
+    specs = []
+    specifications_dir = File.join(options[:gemdir] || Gem.dir, "specifications")
+    Gem::Cache.from_installed_gems(specifications_dir).each do |path, spec|
+      specs << {
+        "name"           => spec.name,
+        "version"        => spec.version,
+        "full_name"      => spec.full_name,
+        "summary"        => spec.summary,
+        "rdoc_installed" => Gem::DocManager.new(spec).rdoc_installed?,
+        "doc_path"       => ('/doc_root/' + spec.full_name + '/rdoc/index.html')
+      }
+    end
+    specs = specs.sort_by { |spec| [spec["name"].downcase, spec["version"]] }
+    template = TemplatePage.new(DOC_TEMPLATE)
+    res['content-type'] = 'text/html'
+    template.write_html_on(res.body, {"specs" => specs})      
+  }
+  {"/gems" => "/cache/", "/doc_root" => "/doc/"}.each do |mount_point, mount_dir|
+    s.mount(mount_point, WEBrick::HTTPServlet::FileHandler, File.join(options[:gemdir] || Gem.dir, mount_dir), true)
+  end
+  trap("INT"){ s.shutdown }
+  s.start
+end

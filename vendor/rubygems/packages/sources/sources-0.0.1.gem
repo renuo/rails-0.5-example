@@ -1,0 +1,52 @@
+MD5SUM = "7f76068ba7564d9a386c2b778632ce48"
+if $0 == __FILE__
+  require 'optparse'
+
+  options = {}
+  ARGV.options do |opts|
+    opts.on_tail("--help", "show this message") {puts opts; exit}
+    opts.on('--dir=DIRNAME', "Installation directory for the Gem") {|options[:directory]|}
+    opts.on('--force', "Force Gem to intall, bypassing dependency checks") {|options[:force]|}
+    opts.on('--gen-rdoc', "Generate RDoc documentation for the Gem") {|options[:gen_rdoc]|}
+    opts.parse!
+  end
+
+  require 'rubygems'
+  Gem::manage_gems
+  @directory = options[:directory] || Gem.dir  
+  @force = options[:force]
+
+  gem = Gem::Installer.new(__FILE__).install(@force, @directory)      
+  if options[:gen_rdoc]
+    Gem::DocManager.new(gem).generate_rdoc
+  end
+end
+
+__END__
+--- !ruby/object:Gem::Specification 
+rubygems_version: "0.7"
+name: sources
+version: !ruby/object:Gem::Version 
+  version: 0.0.1
+date: 2004-07-09 08:50:24.823381 -04:00
+platform: ruby
+summary: This package provides download sources for remote gem installation
+require_paths: 
+  - lib
+files: 
+  - lib/sources.rb
+autorequire: sources
+required_ruby_version: !ruby/object:Gem::Version::Requirement 
+  requirements: 
+    - 
+      - ">"
+      - !ruby/object:Gem::Version 
+        version: 0.0.0
+--- 
+- 
+  size: 74
+  mode: 420
+  path: lib/sources.rb
+---
+eJzLzU8pzUlVcE/N5VJQSElNUyhOzUnTK84vLUpOLQYKKShEK2WUlBRY6eun
+p+YW6xWVJlWm5Relp+oBCaVYoIrUvBQuEAYAlB4YBA==

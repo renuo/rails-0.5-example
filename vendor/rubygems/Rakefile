@@ -1,0 +1,102 @@
+# Rakefile for RubyGems      -*- ruby -*-
+
+require 'rubygems'
+require 'rake/clean'
+require 'rake/testtask'
+require 'rake/packagetask'
+
+PKG_NAME = 'rubygems'
+PKG_VERSION = `ruby -Ilib bin/gem environment packageversion`.chomp
+
+CLEAN.include("COMMENTS")
+CLOBBER.include(
+  "test/data/one/one-0.0.1.gem",
+  "test/temp",
+  'test/data/gemhome',
+  'scripts/*.wiki'
+  )
+
+task :default => [:test]
+
+desc "Run unit tests"
+task :test do
+  test_name = ENV['TEST'] || 'test/test*.rb'
+  ruby %{-Ilib -rscripts/runtest -e 'run_tests("#{test_name}", true)'}
+end
+
+desc "Run Functional Tests"
+task :functional do
+  test_name = ENV['TEST'] || 'test/functional.rb'
+  ruby %{-Ilib -rscripts/runtest -e 'run_tests("#{test_name}", true)'}
+end
+
+desc "Run All Tests"
+task :alltests do
+  test_name = ENV['TEST'] || 'test/{test,functional}*.rb'
+  ruby %{-Ilib -rscripts/runtest -e 'run_tests("#{test_name}", true)'}
+end
+
+
+# Shortcuts for test targets
+task :ft => [:functional]
+task :ut => [:test]
+task :at => [:alltests]
+
+task :gemtest do
+  ruby %{-Ilib -rscripts/runtest -e 'run_tests("test/test_gempaths.rb", true)'}
+end
+
+# Wiki Doc Targets
+
+desc "Build the Wiki documentation"
+task :wiki => ['scripts/gemdoc.wiki', 'scripts/specdoc.wiki']
+
+file 'scripts/gemdoc.wiki' => ['scripts/gemdoc.rb', 'scripts/gemdoc.data'] do
+  chdir('scripts') do
+    ruby %{-I../lib gemdoc.rb <gemdoc.data >gemdoc.wiki}
+  end
+end
+
+file 'scripts/specdoc.wiki' =>
+  ['scripts/specdoc.rb', 'scripts/specdoc.data', 'scripts/specdoc.yaml'] do
+  chdir('scripts') do
+    ruby %{-I../lib specdoc.rb >specdoc.wiki}
+  end
+end
+
+# Package tasks
+
+Rake::PackageTask.new("package") do |p|
+  p.name = PKG_NAME
+  p.version = PKG_VERSION
+  p.need_tar = true
+  p.need_zip = true
+  p.package_files.include(
+    "Rakefile", "ChangeLog", "Releases", "TODO", "README", 
+    "install.rb",
+    "bin/gem*", "bin/*.rb",
+    "doc/*.css", "doc/*.rb",
+    "examples/**/*",
+    "gemspecs/**/*",
+    "lib/**/*.rb",
+    "packages/**/*",
+    "redist/*.gem",
+    "scripts/*.rb",
+    "test/**/*"
+    )
+end
+
+# Install RubyGems
+
+desc "Install RubyGems"
+task :install do
+  ruby 'install.rb'
+end
+
+# Run 'gem' (using local bin and lib directories).
+
+desc "Run local 'gem'"
+task :gem do
+  ARGV.shift
+  exec "ruby -Ilib bin/gem #{ARGV.join(' ')}"
+end

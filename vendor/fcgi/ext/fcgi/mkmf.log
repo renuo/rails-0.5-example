@@ -1,0 +1,27 @@
+have_header: checking for fcgiapp.h... -------------------- yes
+
+"gcc -E -I/usr/local/lib/ruby/1.8/i686-linux -I/usr/local/lib/ruby/1.8/i686-linux  -g -O2  conftest.c -o conftest.i"
+checked program was:
+/* begin */
+#include <fcgiapp.h>
+/* end */
+
+--------------------
+
+have_library: checking for FCGX_Accept() in -lfcgi... -------------------- yes
+
+"gcc -o conftest -I/usr/local/lib/ruby/1.8/i686-linux -I/usr/local/lib/ruby/1.8/i686-linux  -g -O2 conftest.c  -L"/usr/local/lib"       -lruby-static -lfcgi  -ldl -lcrypt -lm   -lc"
+conftest.c: In function 't':
+conftest.c:4:11: warning: implicit declaration of function 'FCGX_Accept' [-Wimplicit-function-declaration]
+ int t() { FCGX_Accept(); return 0; }
+           ^~~~~~~~~~~
+checked program was:
+/* begin */
+
+/*top*/
+int main() { return 0; }
+int t() { FCGX_Accept(); return 0; }
+/* end */
+
+--------------------
+

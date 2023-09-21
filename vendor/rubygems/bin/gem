@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+Gem.manage_gems
+
+Gem::GemRunner.new.run(ARGV)
