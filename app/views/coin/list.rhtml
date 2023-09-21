@@ -1,9 +1,12 @@
+<!-- views/coin/list.rhtml -->
 <h2><%= @coins.length %> gifcoins made someone happy!</h2>
 
 <ul>
   <% @coins.each do |coin| %>
     <li>
-      <strong><%= coin.sender.name %> &rarr; <%= coin.receiver.name || coin.receiver.email[0..0].upcase %></strong>
+      <strong>
+        <%= coin.sender.name %> &rarr; <%= coin.receiver.name || coin.receiver.email[0..0].upcase %>
+      </strong>
       <p><%= coin.message %></p>
     </li>
   <% end %>

@@ -1,4 +1,4 @@
-DROP SCHEMA rails_production;
+-- DROP SCHEMA rails_production;
 CREATE SCHEMA rails_production DEFAULT CHARACTER SET utf8 ;
 USE rails_production;
 

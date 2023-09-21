@@ -5,10 +5,13 @@ require "coin"
 class CoinController < ApplicationController
   include CoinHelper
 
+  class TransactionException < Exception
+  end
+
   before_filter :authorize_user!
 
   def list
-    @coins = Coin.find_all
+    @coins = current_user.given_coins + current_user.received_coins
   end
 
   def mine
@@ -21,17 +24,21 @@ class CoinController < ApplicationController
     @receiver = User.find_or_create(receiver_params["email"])
     @coin = Coin.new(coin_params.merge("sender" => sender, "receiver" => @receiver))
 
-    # Antecedent deduction (prepaid race conditions for hacker)
-    User.update_all('budget = budget - 1', ['id = %d', sender.id])
+    ActiveRecord::Base.transaction(sender, @coin) do
+      if sender.budget > 0 && @receiver.valid?
+        User.update_all("budget = budget - 1", ["id = %d", sender.id])
+        @coin.save
 
-    if sender.budget >= 0 && @receiver.valid? && @coin.save
-      flash["notice"] = "A gifcoin was sent to #{@receiver.name || @receiver.email}"
-      redirect_to :controller => 'coin', :action => "mine"
-    else
-      User.update_all('budget = budget + 1', ['id = %d', sender.id])
-      flash["notice"] = "Validation failed"
-      render_action :mine
+        raise TransactionException if User.find_first(["id = %d AND budget < 0", sender.id]) || !@coin.id?
+      end
     end
+
+    flash["notice"] = "A gifcoin was sent to #{@receiver.name || @receiver.email}"
+    redirect_to :controller => 'coin', :action => "mine"
+
+  rescue TransactionException
+    flash["notice"] = "Validation failed"
+    render_action :mine
   end
 
   private

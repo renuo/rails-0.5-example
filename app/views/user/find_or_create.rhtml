@@ -1,3 +1,5 @@
 <h2>Almost done…</h2>
 
-<p>You received an email to <%= @user.email %></p>
+<p>This is a fake email to <%= @user.email %></p>
+
+<a href="<%= url_for(:action => "login", :params => {"otp" => @user.login_token}) %>">Click to login</a>

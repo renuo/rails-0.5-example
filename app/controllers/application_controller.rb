@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
     Hash[*hash.select {|key, _value| keys.include?(key) }.flatten]
   end
 
+  def local_request? #:doc:
+    super || @request.remote_addr[0..6] == "172.17."
+  end
+
   def current_user
     if @session["user_id"]
       User.find_first(["id = %d", @session["user_id"]]) # TODO: caching?
