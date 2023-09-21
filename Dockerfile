@@ -58,5 +58,8 @@ RUN cd /var/www/rails/vendor/fcgi && ruby install.rb # To run app with productio
 RUN cd /var/www/rails/vendor/rake && ruby install.rb # To run tests and generators
 RUN cd /var/www/rails/vendor/rubygems && ruby install.rb # Rakefile dependency to publish activerecord and actionpack
 
+# Patch Ruby for Rubymine analysis
+RUN echo "RbConfig = Config" >> /usr/local/lib/ruby/1.8/i686-linux/rbconfig.rb
+
 EXPOSE 80
 CMD ["/var/www/rails/bin/startup.sh"]
