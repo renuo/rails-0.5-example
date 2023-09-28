@@ -1,13 +1,17 @@
-Find the presentation slides here:
+This is a sample project using the first ever published version of Rails.
+
+A slide deck draft could give a bit more context about the why and how:
 https://docs.google.com/presentation/d/1gLOVBYliWIQoFG3W8weyQJtTZ7pdNmHJd-rNQ1YEYoU/edit#slide=id.g2f0470d824_1_0
 
-Run with docker:
+You can run the app if you have Docker installed with the following commands:
 
 ```sh
 bin/setup
 bin/run
 bin/enter
 ```
+
+Below follows the orginal README of Rails 0.5:
 
 == Welcome to Rails
 
